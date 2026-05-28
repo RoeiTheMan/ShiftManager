@@ -5,9 +5,17 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.firebase.analytics.FirebaseAnalytics;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,24 +24,36 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView rvShifts;
     private ShiftAdapter adapter;
     private List<Shift> shiftList;
+    private FirebaseFirestore db;
+    private FirebaseAnalytics analytics;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        db = FirebaseFirestore.getInstance();
+        analytics = FirebaseAnalytics.getInstance(this);
+
+        analytics.logEvent("manager_screen_opened", null);
+        FirebaseCrashlytics.getInstance().log("Manager screen opened");
+
         rvShifts = findViewById(R.id.rvShifts);
         rvShifts.setLayoutManager(new LinearLayoutManager(this));
 
-        createMockData();
-
+        shiftList = new ArrayList<>();
         adapter = new ShiftAdapter(shiftList, true);
         rvShifts.setAdapter(adapter);
+
+        loadShiftsFromFirestore();
 
         Button btnSwitchView = findViewById(R.id.btnSwitchView);
         btnSwitchView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                analytics.logEvent("employee_view_clicked", null);
+                FirebaseCrashlytics.getInstance().log("Employee View button clicked");
+
                 Intent intent = new Intent(MainActivity.this, EmployeeActivity.class);
                 startActivity(intent);
             }
@@ -43,7 +63,10 @@ public class MainActivity extends AppCompatActivity {
         fabAddShift.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                android.widget.Toast.makeText(MainActivity.this, "Opening shift creation menu...", android.widget.Toast.LENGTH_SHORT).show();
+                analytics.logEvent("add_shift_clicked", null);
+                FirebaseCrashlytics.getInstance().log("Add Shift button clicked");
+
+                Toast.makeText(MainActivity.this, "Opening shift creation menu...", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -51,19 +74,49 @@ public class MainActivity extends AppCompatActivity {
         navTeam.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                android.widget.Toast.makeText(MainActivity.this, "Team screen coming soon!", android.widget.Toast.LENGTH_SHORT).show();
+                analytics.logEvent("team_tab_clicked", null);
+                FirebaseCrashlytics.getInstance().log("Team tab clicked");
+
+                Toast.makeText(MainActivity.this, "Team screen coming soon!", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    private void createMockData() {
-        shiftList = new ArrayList<>();
-        shiftList.add(new Shift("1", "Morning Shift - Sales", "2026-10-26", "09:00 - 17:00", "Downtown Branch, Floor 2", 2, 1, 3));
-        shiftList.add(new Shift("2", "Evening Shift - Support", "2026-10-26", "17:00 - 23:00", "Downtown Branch, Floor 1", 1, 0, 2));
-        shiftList.add(new Shift("3", "Morning Shift - Sales", "2026-10-27", "09:00 - 17:00", "Downtown Branch, Floor 2", 3, 0, 3));
-        shiftList.add(new Shift("4", "Afternoon Shift - Sales", "2026-10-28", "13:00 - 17:00", "Downtown Branch, Floor 2", 0, 0, 2));
-        shiftList.add(new Shift("5", "Night Shift - Security", "2026-10-28", "23:00 - 07:00", "Main Entrance", 1, 0, 1));
-        shiftList.add(new Shift("6", "Morning Shift - Support", "2026-10-29", "08:00 - 16:00", "Downtown Branch, Floor 1", 2, 0, 4));
-        shiftList.add(new Shift("7", "Weekend Shift - Sales", "2026-10-31", "10:00 - 18:00", "Downtown Branch, Floor 2", 0, 0, 3));
+    private void loadShiftsFromFirestore() {
+        db.collection("shifts")
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    shiftList.clear();
+
+                    for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                        String id = document.getId();
+                        String title = document.getString("title");
+
+                        Shift shift = new Shift(
+                                id,
+                                title != null ? title : "Untitled Shift",
+                                "2026-10-26",
+                                "09:00 - 17:00",
+                                "Downtown Branch",
+                                0,
+                                0,
+                                3
+                        );
+
+                        shiftList.add(shift);
+                    }
+
+                    adapter.notifyDataSetChanged();
+                    analytics.logEvent("firestore_shifts_loaded", null);
+                    FirebaseCrashlytics.getInstance().log("Firestore shifts loaded successfully");
+
+                    Toast.makeText(MainActivity.this, "Loaded shifts from Firestore", Toast.LENGTH_SHORT).show();
+                })
+                .addOnFailureListener(e -> {
+                    analytics.logEvent("firestore_load_failed", null);
+                    FirebaseCrashlytics.getInstance().recordException(e);
+
+                    Toast.makeText(MainActivity.this, "Failed to load Firestore data", Toast.LENGTH_SHORT).show();
+                });
     }
 }
