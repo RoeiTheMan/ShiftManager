@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -32,6 +33,13 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Guard: this screen requires a signed-in user
+        if (FirebaseAuth.getInstance().getCurrentUser() == null) {
+            startActivity(new Intent(this, LoginActivity.class));
+            finish();
+            return;
+        }
+
         db = FirebaseFirestore.getInstance();
         analytics = FirebaseAnalytics.getInstance(this);
 
@@ -47,15 +55,17 @@ public class MainActivity extends AppCompatActivity {
 
         loadShiftsFromFirestore();
 
-        Button btnSwitchView = findViewById(R.id.btnSwitchView);
-        btnSwitchView.setOnClickListener(new View.OnClickListener() {
+        Button btnLogout = findViewById(R.id.btnLogout);
+        btnLogout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                analytics.logEvent("employee_view_clicked", null);
-                FirebaseCrashlytics.getInstance().log("Employee View button clicked");
+                analytics.logEvent("logout_clicked", null);
+                FirebaseCrashlytics.getInstance().log("Logout clicked (manager)");
 
-                Intent intent = new Intent(MainActivity.this, EmployeeActivity.class);
+                FirebaseAuth.getInstance().signOut();
+                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
                 startActivity(intent);
+                finish();
             }
         });
 

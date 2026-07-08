@@ -22,14 +22,14 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/btnSwitchView"
+        android:id="@+id/btnLogout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="40dp"
         android:layout_marginEnd="16dp"
-        android:backgroundTint="#1976D2"
-        android:textColor="#FFFFFF"
-        android:text="Employee View"
+        android:backgroundTint="#FFFFFF"
+        android:textColor="#1976D2"
+        android:text="Log Out"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -41,7 +41,7 @@
         app:layout_constraintBottom_toTopOf="@+id/bottomNavManager"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnSwitchView" />
+        app:layout_constraintTop_toBottomOf="@+id/btnLogout" />
 
     <Button
         android:id="@+id/fabAddShift"
