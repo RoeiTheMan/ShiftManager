@@ -8,10 +8,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="com.example.shiftmanager" />
+                  <option name="mobileSdkAppId" value="1:828034105837:android:38759fade007cdad2467e4" />
+                  <option name="projectId" value="shiftmanager-126058d2" />
+                  <option name="projectNumber" value="828034105837" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />
