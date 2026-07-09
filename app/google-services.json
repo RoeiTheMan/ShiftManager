@@ -12,7 +12,20 @@
           "package_name": "com.example.shiftmanager"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "828034105837-mtk32il9cc0vap4kpb6gkraql5jtqm90.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.shiftmanager",
+            "certificate_hash": "b0dc650fff84d53bd88bf853e4f6ef4722561578"
+          }
+        },
+        {
+          "client_id": "828034105837-en6oarsctcjv3ff3bl8k44lqjru10od5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyAd3auxvZAm75-avtB1Qt8cmlX78WgyllA"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "828034105837-en6oarsctcjv3ff3bl8k44lqjru10od5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
