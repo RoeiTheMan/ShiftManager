@@ -45,6 +45,9 @@ dependencies {
     implementation("com.google.firebase:firebase-firestore")
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.android.gms:play-services-auth:21.2.0")
+    // Used by the GPS feature: gets the phone's position so a shift card can show
+    // how far away it is. This is the "phone capability" the final project requires.
+    implementation("com.google.android.gms:play-services-location:21.3.0")
 
     implementation(libs.appcompat)
     implementation(libs.material)

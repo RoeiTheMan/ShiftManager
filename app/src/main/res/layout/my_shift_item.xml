@@ -1,19 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-    One card in the shift feed. The same card is used by the manager feed and the
-    employee feed; ShiftAdapter decides which pieces are shown for each role.
--->
+<!-- One shift the employee has signed up for, with where their application stands. -->
 <androidx.cardview.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/cardShift"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
-    android:clickable="true"
-    android:focusable="true"
-    android:foreground="?android:attr/selectableItemBackground"
     app:cardCornerRadius="8dp"
     app:cardElevation="4dp">
 
@@ -22,34 +15,31 @@
         android:layout_height="wrap_content"
         android:padding="16dp">
 
-        <!-- Shift title, e.g. "Evening waiter" -->
         <TextView
-            android:id="@+id/tvRole"
+            android:id="@+id/tvMyShiftTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
-            android:text="@string/shift_title_placeholder"
             android:textColor="#212121"
             android:textSize="18sp"
             android:textStyle="bold"
-            app:layout_constraintEnd_toStartOf="@id/tvStatus"
+            app:layout_constraintEnd_toStartOf="@id/tvMyShiftStatus"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Evening waiter" />
 
-        <!-- Manager only: "Approved 2/4  Pending 1" -->
         <TextView
-            android:id="@+id/tvStatus"
+            android:id="@+id/tvMyShiftStatus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="#616161"
-            android:textSize="12sp"
+            android:textSize="13sp"
+            android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="Approved 2/4" />
+            tools:text="Approved" />
 
-        <!-- "2026-08-12  |  09:00 - 17:00" -->
         <TextView
-            android:id="@+id/tvDateTime"
+            android:id="@+id/tvMyShiftWhen"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
@@ -57,12 +47,11 @@
             android:textSize="14sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvRole"
+            app:layout_constraintTop_toBottomOf="@id/tvMyShiftTitle"
             tools:text="2026-08-12  |  09:00 - 17:00" />
 
-        <!-- Where the shift is, plus the GPS distance when we can work it out -->
         <TextView
-            android:id="@+id/tvLocation"
+            android:id="@+id/tvMyShiftWhere"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
@@ -70,18 +59,8 @@
             android:textSize="13sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvDateTime"
-            tools:text="Downtown Branch  ·  2.4 km away" />
-
-        <Button
-            android:id="@+id/btnAction"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:textColor="@android:color/white"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvLocation"
-            tools:text="Sign up" />
+            app:layout_constraintTop_toBottomOf="@id/tvMyShiftWhen"
+            tools:text="Downtown Branch" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>

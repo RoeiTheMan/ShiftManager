@@ -1,3 +1,75 @@
 <resources>
     <string name="app_name">ShiftManager</string>
+
+    <!-- Shift feed -->
+    <string name="shift_title_placeholder">Shift</string>
+    <string name="manager_feed_title">Shift dashboard</string>
+    <string name="employee_feed_title">Available shifts</string>
+    <string name="my_shifts_title">My shifts</string>
+    <string name="staff_directory_title">Staff directory</string>
+    <string name="shift_detail_title">Shift details</string>
+    <string name="create_shift_title">New shift</string>
+
+    <!-- Empty states -->
+    <string name="empty_shifts_manager">No shifts yet.\nTap + to publish the first one.</string>
+    <string name="empty_shifts_employee">No shifts available right now.\nCheck back later.</string>
+    <string name="empty_my_shifts">You have not signed up for any shifts yet.</string>
+    <string name="empty_staff">No employees yet.\nTap + to add one.</string>
+    <string name="empty_applicants">Nobody has applied for this shift yet.</string>
+
+    <!-- Actions -->
+    <string name="action_sign_up">Sign up</string>
+    <string name="action_cancel_registration">Cancel</string>
+    <string name="action_manage">Manage</string>
+    <string name="action_approve">Approve</string>
+    <string name="action_remove">Remove</string>
+    <string name="action_save">Save shift</string>
+    <string name="action_add_employee">Add employee</string>
+    <string name="action_use_my_location">Use my current location</string>
+    <string name="action_logout">Log out</string>
+    <string name="action_delete_shift">Delete shift</string>
+
+    <!-- Create-shift form -->
+    <string name="hint_title">Title (e.g. Evening waiter)</string>
+    <string name="hint_description">Description</string>
+    <string name="hint_date">Date</string>
+    <string name="hint_start_time">Start time</string>
+    <string name="hint_end_time">End time</string>
+    <string name="hint_location">Location</string>
+    <string name="hint_max_workers">Workers needed</string>
+    <string name="hint_employee_name">Employee name</string>
+    <string name="hint_employee_email">Employee email</string>
+
+    <!-- Messages -->
+    <string name="msg_shift_created">Shift published</string>
+    <string name="msg_shift_deleted">Shift deleted</string>
+    <string name="msg_signed_up">Signed up — waiting for approval</string>
+    <string name="msg_registration_cancelled">Registration cancelled</string>
+    <string name="msg_approved">Approved</string>
+    <string name="msg_removed">Removed</string>
+    <string name="msg_employee_added">Employee added</string>
+    <string name="msg_employee_removed">Employee removed</string>
+    <string name="msg_shift_full">This shift is already full</string>
+    <string name="msg_load_failed">Could not load data. Check your connection.</string>
+    <string name="msg_save_failed">Could not save. Please try again.</string>
+    <string name="msg_location_permission_needed">Location permission is needed to show how far a shift is.</string>
+    <string name="msg_location_unavailable">Could not get your location right now.</string>
+    <string name="msg_location_captured">Location captured</string>
+
+    <!-- Confirmations -->
+    <string name="confirm_delete_shift">This will also remove everyone who signed up for this shift. Delete it?</string>
+    <string name="confirm_remove_employee">Remove this employee and any shifts they signed up for?</string>
+
+    <!-- Validation -->
+    <string name="error_required">Required</string>
+    <string name="error_workers_positive">Must be at least 1</string>
+    <string name="error_end_before_start">End time must be after the start time</string>
+
+    <!-- Formats -->
+    <string name="format_approved">Approved %1$d/%2$d</string>
+    <string name="format_pending">Pending %1$d</string>
+    <string name="format_pending_label">Waiting for approval</string>
+    <string name="format_distance_km">%1$.1f km away</string>
+    <string name="format_distance_m">%1$d m away</string>
+    <string name="format_applicant_status">Status: %1$s</string>
 </resources>

@@ -2,6 +2,18 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!--
+        The app needs the internet to reach Firebase, and location for the phone
+        capability the final project requires: the manager stamps a shift's real
+        position when publishing it, and employees see how far away each shift is.
+
+        Declaring the permissions here is only half the job: from Android 6 the
+        user must also grant location at runtime, which LocationHelper handles.
+    -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -22,9 +34,17 @@
             </intent-filter>
         </activity>
 
+        <!-- Manager side -->
         <activity android:name=".MainActivity" />
+        <activity android:name=".CreateShiftActivity" />
+        <activity android:name=".StaffDirectoryActivity" />
 
+        <!-- Employee side -->
         <activity android:name=".EmployeeActivity" />
+        <activity android:name=".MyShiftsActivity" />
+
+        <!-- Opened by both roles: the manager can approve here, the employee reads only -->
+        <activity android:name=".ShiftDetailActivity" />
 
     </application>
 

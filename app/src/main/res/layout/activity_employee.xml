@@ -43,6 +43,34 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btnLogout" />
 
+    <!-- Shown while the first Firestore read is in flight. -->
+    <ProgressBar
+        android:id="@+id/progressShifts"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/rvEmployeeShifts"
+        app:layout_constraintEnd_toEndOf="@id/rvEmployeeShifts"
+        app:layout_constraintStart_toStartOf="@id/rvEmployeeShifts"
+        app:layout_constraintTop_toTopOf="@id/rvEmployeeShifts" />
+
+    <!-- Shown instead of the list when there are genuinely no shifts. -->
+    <TextView
+        android:id="@+id/tvEmptyShifts"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
+        android:gravity="center"
+        android:text="@string/empty_shifts_employee"
+        android:textColor="#757575"
+        android:textSize="16sp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/rvEmployeeShifts"
+        app:layout_constraintEnd_toEndOf="@id/rvEmployeeShifts"
+        app:layout_constraintStart_toStartOf="@id/rvEmployeeShifts"
+        app:layout_constraintTop_toTopOf="@id/rvEmployeeShifts" />
+
     <LinearLayout
         android:id="@+id/bottomNavEmployee"
         android:layout_width="0dp"

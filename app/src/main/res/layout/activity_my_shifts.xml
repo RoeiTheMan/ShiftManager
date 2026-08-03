@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    My Shifts. HW2 describes it as the employee's view of the shifts they are already
+    signed up for, so unlike the feed it lists registrations rather than open shifts.
+-->
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF"
+    tools:context=".MyShiftsActivity">
+
+    <TextView
+        android:id="@+id/tvMyShiftsTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="48dp"
+        android:text="@string/my_shifts_title"
+        android:textColor="#1976D2"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvMyShifts"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvMyShiftsTitle" />
+
+    <ProgressBar
+        android:id="@+id/progressMyShifts"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@id/rvMyShifts"
+        app:layout_constraintEnd_toEndOf="@id/rvMyShifts"
+        app:layout_constraintStart_toStartOf="@id/rvMyShifts"
+        app:layout_constraintTop_toTopOf="@id/rvMyShifts" />
+
+    <TextView
+        android:id="@+id/tvEmptyMyShifts"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
+        android:gravity="center"
+        android:text="@string/empty_my_shifts"
+        android:textColor="#757575"
+        android:textSize="16sp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/rvMyShifts"
+        app:layout_constraintEnd_toEndOf="@id/rvMyShifts"
+        app:layout_constraintStart_toStartOf="@id/rvMyShifts"
+        app:layout_constraintTop_toTopOf="@id/rvMyShifts" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
