@@ -3,11 +3,8 @@
 
     <!-- Shift feed -->
     <string name="shift_title_placeholder">Shift</string>
-    <string name="manager_feed_title">Shift dashboard</string>
-    <string name="employee_feed_title">Available shifts</string>
     <string name="my_shifts_title">My shifts</string>
     <string name="staff_directory_title">Staff directory</string>
-    <string name="shift_detail_title">Shift details</string>
     <string name="create_shift_title">New shift</string>
 
     <!-- Empty states -->

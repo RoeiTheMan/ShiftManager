@@ -201,7 +201,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private void routeUser(FirebaseUser user) {
         setLoading(true);
-        db.collection("users").document(user.getUid())
+        db.collection(Constants.COLLECTION_USERS).document(user.getUid())
                 .get()
                 .addOnSuccessListener(snapshot -> {
                     if (snapshot.exists()) {
@@ -224,7 +224,7 @@ public class LoginActivity extends AppCompatActivity {
                 .setTitle("Welcome! What is your role?")
                 .setCancelable(false)
                 .setItems(roles, (dialog, which) -> {
-                    String role = which == 0 ? "manager" : "employee";
+                    String role = which == 0 ? Constants.ROLE_MANAGER : Constants.ROLE_EMPLOYEE;
                     createUserProfile(user, role);
                 })
                 .show();
@@ -239,13 +239,14 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         Map<String, Object> profile = new HashMap<>();
-        profile.put("name", name);
-        profile.put("email", user.getEmail());
-        profile.put("role", role);
-        profile.put("active", true);
-        profile.put("createdAt", com.google.firebase.firestore.FieldValue.serverTimestamp());
+        profile.put(Constants.FIELD_NAME, name);
+        profile.put(Constants.FIELD_EMAIL, user.getEmail());
+        profile.put(Constants.FIELD_ROLE, role);
+        profile.put(Constants.FIELD_ACTIVE, true);
+        profile.put(Constants.FIELD_CREATED_AT,
+                com.google.firebase.firestore.FieldValue.serverTimestamp());
 
-        db.collection("users").document(user.getUid())
+        db.collection(Constants.COLLECTION_USERS).document(user.getUid())
                 .set(profile)
                 .addOnSuccessListener(unused -> {
                     analytics.logEvent("role_selected_" + role, null);
@@ -260,13 +261,13 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void openHomeForRole(DocumentSnapshot userDoc) {
-        String role = userDoc.getString("role");
-        openHome(role != null ? role : "employee");
+        String role = userDoc.getString(Constants.FIELD_ROLE);
+        openHome(role != null ? role : Constants.ROLE_EMPLOYEE);
     }
 
     private void openHome(String role) {
         Intent intent;
-        if ("manager".equals(role)) {
+        if (Constants.ROLE_MANAGER.equals(role)) {
             intent = new Intent(this, MainActivity.class);
         } else {
             intent = new Intent(this, EmployeeActivity.class);

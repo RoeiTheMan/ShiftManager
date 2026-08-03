@@ -1,6 +1,7 @@
 package com.example.shiftmanager;
 
 import android.content.Intent;
+import android.location.Location;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -8,6 +9,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -35,6 +37,7 @@ public class EmployeeActivity extends AppCompatActivity implements ShiftAdapter.
 
     private ShiftAdapter adapter;
     private FirebaseAnalytics analytics;
+    private LocationHelper locationHelper;
 
     private RecyclerView rvShifts;
     private ProgressBar progressShifts;
@@ -59,10 +62,54 @@ public class EmployeeActivity extends AppCompatActivity implements ShiftAdapter.
         FirebaseCrashlytics.getInstance().log("Employee screen opened");
 
         employeeName = displayNameOf(user);
+        locationHelper = new LocationHelper(this);
 
         bindViews();
         setUpList();
         setUpButtons();
+        requestLocationForDistances();
+    }
+
+    /**
+     * Asks for location so each card can show how far away the shift is.
+     *
+     * This is the side of the GPS feature the employee actually benefits from: deciding
+     * whether a shift is worth travelling to. A refusal is not an error -- the distance
+     * line just stays empty and everything else still works.
+     */
+    private void requestLocationForDistances() {
+        if (!locationHelper.hasPermission()) {
+            locationHelper.requestPermission();
+            return;
+        }
+        loadCurrentLocation();
+    }
+
+    private void loadCurrentLocation() {
+        locationHelper.fetchCurrentLocation(new Callback<Location>() {
+            @Override
+            public void onSuccess(Location location) {
+                if (location != null) {
+                    adapter.setCurrentLocation(location);
+                }
+            }
+
+            @Override
+            public void onError(Exception error) {
+                FirebaseCrashlytics.getInstance().log("Employee feed could not read location");
+            }
+        });
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (LocationHelper.isPermissionGranted(requestCode, grantResults)) {
+            loadCurrentLocation();
+        }
     }
 
     @Override

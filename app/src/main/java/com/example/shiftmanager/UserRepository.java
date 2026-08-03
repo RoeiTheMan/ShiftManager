@@ -2,6 +2,7 @@ package com.example.shiftmanager;
 
 import androidx.annotation.NonNull;
 
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -64,7 +65,7 @@ public class UserRepository {
         data.put(Constants.FIELD_EMAIL, email);
         data.put(Constants.FIELD_ROLE, Constants.ROLE_EMPLOYEE);
         data.put(Constants.FIELD_ACTIVE, true);
-        data.put(Constants.FIELD_CREATED_AT, System.currentTimeMillis());
+        data.put(Constants.FIELD_CREATED_AT, FieldValue.serverTimestamp());
 
         db.collection(Constants.COLLECTION_USERS)
                 .add(data)

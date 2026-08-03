@@ -1,6 +1,7 @@
 package com.example.shiftmanager;
 
 import android.content.Intent;
+import android.location.Location;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -8,6 +9,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -34,6 +36,7 @@ public class MainActivity extends AppCompatActivity implements ShiftAdapter.OnSh
 
     private ShiftAdapter adapter;
     private FirebaseAnalytics analytics;
+    private LocationHelper locationHelper;
 
     private RecyclerView rvShifts;
     private ProgressBar progressShifts;
@@ -54,9 +57,54 @@ public class MainActivity extends AppCompatActivity implements ShiftAdapter.OnSh
         analytics.logEvent("manager_screen_opened", null);
         FirebaseCrashlytics.getInstance().log("Manager screen opened");
 
+        locationHelper = new LocationHelper(this);
+
         bindViews();
         setUpList();
         setUpButtons();
+        requestLocationForDistances();
+    }
+
+    /**
+     * Asks for location so each card can show how far away the shift is.
+     *
+     * The feed works perfectly well without it, so a refusal is not treated as an error:
+     * the distance line simply stays empty. Permission is only asked for once per launch.
+     */
+    private void requestLocationForDistances() {
+        if (!locationHelper.hasPermission()) {
+            locationHelper.requestPermission();
+            return;
+        }
+        loadCurrentLocation();
+    }
+
+    private void loadCurrentLocation() {
+        locationHelper.fetchCurrentLocation(new Callback<Location>() {
+            @Override
+            public void onSuccess(Location location) {
+                if (location != null) {
+                    adapter.setCurrentLocation(location);
+                }
+            }
+
+            @Override
+            public void onError(Exception error) {
+                // Distances are a nicety here; the feed itself is unaffected.
+                FirebaseCrashlytics.getInstance().log("Manager feed could not read location");
+            }
+        });
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (LocationHelper.isPermissionGranted(requestCode, grantResults)) {
+            loadCurrentLocation();
+        }
     }
 
     /**

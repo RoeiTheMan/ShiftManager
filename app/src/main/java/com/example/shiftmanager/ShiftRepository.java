@@ -2,6 +2,7 @@ package com.example.shiftmanager;
 
 import androidx.annotation.NonNull;
 
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -129,7 +130,9 @@ public class ShiftRepository {
         data.put(Constants.FIELD_MAX_WORKERS, shift.getMaxWorkers());
         data.put(Constants.FIELD_STATUS, Constants.SHIFT_OPEN);
         data.put(Constants.FIELD_CREATED_BY, shift.getCreatedBy());
-        data.put(Constants.FIELD_CREATED_AT, System.currentTimeMillis());
+        // Server time, not the phone's: a device with a wrong clock would otherwise
+        // write a createdAt that sorts records into the wrong order.
+        data.put(Constants.FIELD_CREATED_AT, FieldValue.serverTimestamp());
 
         db.collection(Constants.COLLECTION_SHIFTS)
                 .add(data)
@@ -270,7 +273,7 @@ public class ShiftRepository {
         data.put(Constants.FIELD_EMPLOYEE_NAME, employeeName);
         data.put(Constants.FIELD_STATUS, Constants.REGISTRATION_PENDING);
         data.put(Constants.FIELD_NOTE, "");
-        data.put(Constants.FIELD_CREATED_AT, System.currentTimeMillis());
+        data.put(Constants.FIELD_CREATED_AT, FieldValue.serverTimestamp());
 
         db.collection(Constants.COLLECTION_REGISTRATIONS)
                 .add(data)
