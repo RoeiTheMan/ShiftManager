@@ -33,15 +33,33 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <!-- The role line, same as the manager's screen. Tapping it switches business. -->
+    <TextView
+        android:id="@+id/tvHeaderSubtitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginEnd="16dp"
+        android:background="?android:attr/selectableItemBackground"
+        android:paddingTop="2dp"
+        android:paddingBottom="4dp"
+        android:textColor="#757575"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvEmployeeTitle"
+        tools:text="Employee · Golden Events" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvEmployeeShifts"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="12dp"
         app:layout_constraintBottom_toTopOf="@+id/bottomNavEmployee"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnLogout" />
+        app:layout_constraintTop_toBottomOf="@id/tvHeaderSubtitle" />
 
     <!-- Shown while the first Firestore read is in flight. -->
     <ProgressBar

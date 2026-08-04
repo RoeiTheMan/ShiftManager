@@ -52,9 +52,9 @@ public class EmployeeActivity extends AppCompatActivity implements ShiftAdapter.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_employee);
 
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user == null) {
-            goToLogin();
+        // Needs a signed-in user AND a loaded business, since Android can reopen this
+        // screen after killing the app, leaving the account signed in but Session empty.
+        if (!SessionUi.requireSession(this)) {
             return;
         }
 
@@ -62,7 +62,9 @@ public class EmployeeActivity extends AppCompatActivity implements ShiftAdapter.
         analytics.logEvent("employee_screen_opened", null);
         FirebaseCrashlytics.getInstance().log("Employee screen opened");
 
-        loadEmployeeName(user.getUid());
+        // The name is already in the session from sign-in, so there is no second read and
+        // no window where a registration could be stamped with a half-loaded name.
+        employeeName = Session.getUser().getName();
         locationHelper = new LocationHelper(this);
 
         bindViews();
@@ -116,44 +118,19 @@ public class EmployeeActivity extends AppCompatActivity implements ShiftAdapter.
     @Override
     protected void onResume() {
         super.onResume();
-        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+        // Session, not just auth: onCreate may already have sent us back to login.
+        if (Session.isReady()) {
             loadShifts();
         }
-    }
-
-    /**
-     * Loads this employee's name from their profile in the users collection.
-     *
-     * It deliberately does NOT use the Firebase Auth display name. Google sign-ins have
-     * one, but email/password sign-ups do not, so that route fell back to showing the raw
-     * email address -- which then appeared as the applicant's "name" on the manager's
-     * approval screen. LoginActivity already saves a proper name when the profile is
-     * created, so reading it back keeps one source of truth for what a person is called.
-     */
-    private void loadEmployeeName(String userId) {
-        userRepository.loadUser(userId, new Callback<AppUser>() {
-            @Override
-            public void onSuccess(AppUser user) {
-                employeeName = user.getName();
-            }
-
-            @Override
-            public void onError(Exception error) {
-                // Fall back to the email prefix, the same shape LoginActivity would save.
-                FirebaseUser current = FirebaseAuth.getInstance().getCurrentUser();
-                String email = current != null && current.getEmail() != null
-                        ? current.getEmail() : "";
-                employeeName = email.contains("@")
-                        ? email.substring(0, email.indexOf('@'))
-                        : "Employee";
-            }
-        });
     }
 
     private void bindViews() {
         rvShifts = findViewById(R.id.rvEmployeeShifts);
         progressShifts = findViewById(R.id.progressShifts);
         tvEmptyShifts = findViewById(R.id.tvEmptyShifts);
+
+        // "Employee · Golden Events", and tapping it switches business.
+        SessionUi.bindHeader(this, findViewById(R.id.tvHeaderSubtitle));
     }
 
     private void setUpList() {
@@ -168,6 +145,8 @@ public class EmployeeActivity extends AppCompatActivity implements ShiftAdapter.
             analytics.logEvent("logout_clicked", null);
             FirebaseCrashlytics.getInstance().log("Logout clicked (employee)");
             FirebaseAuth.getInstance().signOut();
+            // Otherwise the next person to sign in would briefly see the old business.
+            Session.clear();
             goToLogin();
         });
 

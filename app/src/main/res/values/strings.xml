@@ -121,6 +121,11 @@
     <string name="error_need_one_role">Add at least one staff role</string>
     <string name="msg_business_created">Business created</string>
 
+    <!-- Header and business switcher -->
+    <string name="format_header_role_business">%1$s · %2$s</string>
+    <string name="switcher_title">Switch business</string>
+    <string name="action_join_another">Join another business…</string>
+
     <!-- Formats -->
     <string name="format_approved">Approved %1$d/%2$d</string>
     <string name="format_pending">Pending %1$d</string>

@@ -47,9 +47,10 @@ public class MainActivity extends AppCompatActivity implements ShiftAdapter.OnSh
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // This screen requires a signed-in user; bounce back to login if there is none.
-        if (FirebaseAuth.getInstance().getCurrentUser() == null) {
-            goToLogin();
+        // Needs a signed-in user AND a loaded business. Both are checked because Android
+        // can kill the app in the background and reopen it straight onto this screen,
+        // which leaves the account signed in but the session empty.
+        if (!SessionUi.requireSession(this)) {
             return;
         }
 
@@ -114,7 +115,9 @@ public class MainActivity extends AppCompatActivity implements ShiftAdapter.OnSh
     @Override
     protected void onResume() {
         super.onResume();
-        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+        // Session, not just auth: onCreate may have already sent us to the login screen,
+        // and reloading against a business that is not there would crash on the way out.
+        if (Session.isReady()) {
             loadShifts();
         }
     }
@@ -123,6 +126,9 @@ public class MainActivity extends AppCompatActivity implements ShiftAdapter.OnSh
         rvShifts = findViewById(R.id.rvShifts);
         progressShifts = findViewById(R.id.progressShifts);
         tvEmptyShifts = findViewById(R.id.tvEmptyShifts);
+
+        // "Manager · Golden Events", and tapping it switches business.
+        SessionUi.bindHeader(this, findViewById(R.id.tvHeaderSubtitle));
     }
 
     private void setUpList() {
@@ -137,6 +143,9 @@ public class MainActivity extends AppCompatActivity implements ShiftAdapter.OnSh
             analytics.logEvent("logout_clicked", null);
             FirebaseCrashlytics.getInstance().log("Logout clicked (manager)");
             FirebaseAuth.getInstance().signOut();
+            // Without this the next person to sign in on this device would briefly see the
+            // previous user's business in the header.
+            Session.clear();
             goToLogin();
         });
 
