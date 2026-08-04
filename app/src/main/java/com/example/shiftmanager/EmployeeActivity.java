@@ -34,6 +34,7 @@ public class EmployeeActivity extends AppCompatActivity implements ShiftAdapter.
 
     private final List<Shift> shifts = new ArrayList<>();
     private final ShiftRepository shiftRepository = new ShiftRepository();
+    private final UserRepository userRepository = new UserRepository();
 
     private ShiftAdapter adapter;
     private FirebaseAnalytics analytics;
@@ -61,7 +62,7 @@ public class EmployeeActivity extends AppCompatActivity implements ShiftAdapter.
         analytics.logEvent("employee_screen_opened", null);
         FirebaseCrashlytics.getInstance().log("Employee screen opened");
 
-        employeeName = displayNameOf(user);
+        loadEmployeeName(user.getUid());
         locationHelper = new LocationHelper(this);
 
         bindViews();
@@ -120,15 +121,33 @@ public class EmployeeActivity extends AppCompatActivity implements ShiftAdapter.
         }
     }
 
-    /** Google gives us a name; email/password sign-ups often do not, so fall back. */
-    private String displayNameOf(FirebaseUser user) {
-        if (user.getDisplayName() != null && !user.getDisplayName().isEmpty()) {
-            return user.getDisplayName();
-        }
-        if (user.getEmail() != null) {
-            return user.getEmail();
-        }
-        return "Employee";
+    /**
+     * Loads this employee's name from their profile in the users collection.
+     *
+     * It deliberately does NOT use the Firebase Auth display name. Google sign-ins have
+     * one, but email/password sign-ups do not, so that route fell back to showing the raw
+     * email address -- which then appeared as the applicant's "name" on the manager's
+     * approval screen. LoginActivity already saves a proper name when the profile is
+     * created, so reading it back keeps one source of truth for what a person is called.
+     */
+    private void loadEmployeeName(String userId) {
+        userRepository.loadUser(userId, new Callback<AppUser>() {
+            @Override
+            public void onSuccess(AppUser user) {
+                employeeName = user.getName();
+            }
+
+            @Override
+            public void onError(Exception error) {
+                // Fall back to the email prefix, the same shape LoginActivity would save.
+                FirebaseUser current = FirebaseAuth.getInstance().getCurrentUser();
+                String email = current != null && current.getEmail() != null
+                        ? current.getEmail() : "";
+                employeeName = email.contains("@")
+                        ? email.substring(0, email.indexOf('@'))
+                        : "Employee";
+            }
+        });
     }
 
     private void bindViews() {

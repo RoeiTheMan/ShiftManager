@@ -50,6 +50,12 @@ public final class Constants {
     public static final String FIELD_EMPLOYEE_NAME = "employeeName";
     public static final String FIELD_NOTE = "note";
 
+    // Written when an approved employee checks in at the start of their shift.
+    public static final String FIELD_CHECKED_IN_AT = "checkedInAt";
+    public static final String FIELD_CHECKIN_LATITUDE = "checkInLatitude";
+    public static final String FIELD_CHECKIN_LONGITUDE = "checkInLongitude";
+    public static final String FIELD_CHECKIN_DISTANCE = "checkInDistanceMetres";
+
     // ---------- User roles ----------
 
     public static final String ROLE_MANAGER = "manager";

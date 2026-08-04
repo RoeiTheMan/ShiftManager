@@ -298,6 +298,35 @@ public class ShiftRepository {
                 .addOnFailureListener(callback::onError);
     }
 
+    /**
+     * The employee checks in at the start of their shift -- the app's use of GPS.
+     *
+     * Both the time and the phone's position are stamped onto the registration. When the
+     * shift has a saved position too, the distance between the two is worked out and
+     * stored, so the manager can see at a glance whether somebody checked in at the site
+     * or from their sofa. Distance is -1 when the shift has no coordinates to compare to,
+     * which is honest about not knowing rather than pretending the distance was zero.
+     */
+    public void checkIn(@NonNull String registrationId,
+                        double latitude,
+                        double longitude,
+                        int distanceMetres,
+                        @NonNull final Callback<Void> callback) {
+        Map<String, Object> updates = new HashMap<>();
+        // The server's clock, not the phone's. Check-in is evidence of attendance, and a
+        // device clock can be changed by the person being recorded.
+        updates.put(Constants.FIELD_CHECKED_IN_AT, FieldValue.serverTimestamp());
+        updates.put(Constants.FIELD_CHECKIN_LATITUDE, latitude);
+        updates.put(Constants.FIELD_CHECKIN_LONGITUDE, longitude);
+        updates.put(Constants.FIELD_CHECKIN_DISTANCE, distanceMetres);
+
+        db.collection(Constants.COLLECTION_REGISTRATIONS)
+                .document(registrationId)
+                .update(updates)
+                .addOnSuccessListener(callback::onSuccess)
+                .addOnFailureListener(callback::onError);
+    }
+
     /** The manager approves an applicant. */
     public void approveRegistration(@NonNull String registrationId,
                                     @NonNull final Callback<Void> callback) {

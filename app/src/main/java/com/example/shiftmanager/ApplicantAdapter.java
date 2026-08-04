@@ -47,8 +47,16 @@ public class ApplicantAdapter extends RecyclerView.Adapter<ApplicantAdapter.Appl
         final Registration registration = applicants.get(position);
 
         holder.tvName.setText(registration.getEmployeeName());
-        holder.tvStatus.setText(holder.itemView.getContext()
-                .getString(R.string.format_applicant_status, registration.getStatus()));
+
+        // Once somebody has checked in, when they arrived is more useful to the manager
+        // than the approval status they already know about.
+        if (registration.isCheckedIn()) {
+            holder.tvStatus.setText(holder.itemView.getContext().getString(
+                    R.string.format_manager_checked_in, registration.getCheckInTimeText()));
+        } else {
+            holder.tvStatus.setText(holder.itemView.getContext()
+                    .getString(R.string.format_applicant_status, registration.getStatus()));
+        }
 
         // Somebody already approved has nothing left to approve, so only Remove applies.
         holder.btnApprove.setVisibility(registration.isApproved() ? View.GONE : View.VISIBLE);

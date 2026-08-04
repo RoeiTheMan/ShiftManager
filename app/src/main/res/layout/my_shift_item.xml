@@ -62,5 +62,34 @@
             app:layout_constraintTop_toBottomOf="@id/tvMyShiftWhen"
             tools:text="Downtown Branch" />
 
+        <!-- The GPS feature: stamps position and time when the employee starts work. -->
+        <Button
+            android:id="@+id/btnCheckIn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:backgroundTint="#2E7D32"
+            android:text="@string/action_check_in"
+            android:textColor="#FFFFFF"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvMyShiftWhere"
+            tools:visibility="visible" />
+
+        <!-- Replaces the button once they have checked in. -->
+        <TextView
+            android:id="@+id/tvCheckedIn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:textColor="#2E7D32"
+            android:textSize="13sp"
+            android:visibility="gone"
+            app:layout_constraintEnd_toStartOf="@id/btnCheckIn"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvMyShiftWhere"
+            tools:text="Checked in 14:05 · 40 m from site"
+            tools:visibility="visible" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>

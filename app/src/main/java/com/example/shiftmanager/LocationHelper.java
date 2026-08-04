@@ -66,12 +66,18 @@ public class LocationHelper {
     /**
      * Asks for the phone's current position.
      *
-     * getCurrentLocation is used rather than getLastLocation because a fresh emulator (or a
-     * phone that has not moved) often has no cached last location at all, which would make
-     * the feature look broken. This asks the hardware for a reading instead.
+     * Two deliberate choices here, both learned from this not working the first time:
      *
-     * The callback receives null when the position could not be obtained, so callers must
-     * handle that rather than assuming success.
+     * PRIORITY_HIGH_ACCURACY asks the GPS hardware directly. The balanced setting leans on
+     * wifi and mobile-network positioning, which an emulator has no real source for, so a
+     * request could sit unanswered forever and the feature looked broken when it was not.
+     *
+     * If that still comes back with nothing, it falls back to the last known position.
+     * A fresh device may have no cached location at all, which is why that is the fallback
+     * rather than the first choice, but between the two something is almost always found.
+     *
+     * The callback still receives null when neither works, so callers must handle that
+     * rather than assuming success.
      */
     public void fetchCurrentLocation(@NonNull final Callback<Location> callback) {
         if (!hasPermission()) {
@@ -81,12 +87,29 @@ public class LocationHelper {
 
         try {
             locationClient.getCurrentLocation(
-                            Priority.PRIORITY_BALANCED_POWER_ACCURACY,
+                            Priority.PRIORITY_HIGH_ACCURACY,
                             new CancellationTokenSource().getToken())
+                    .addOnSuccessListener(location -> {
+                        if (location != null) {
+                            callback.onSuccess(location);
+                        } else {
+                            fetchLastKnownLocation(callback);
+                        }
+                    })
+                    .addOnFailureListener(error -> fetchLastKnownLocation(callback));
+        } catch (SecurityException e) {
+            // Permission was revoked between the check above and the call itself.
+            callback.onError(e);
+        }
+    }
+
+    /** Fallback used when a live reading is unavailable. May still hand back null. */
+    private void fetchLastKnownLocation(@NonNull final Callback<Location> callback) {
+        try {
+            locationClient.getLastLocation()
                     .addOnSuccessListener(callback::onSuccess)
                     .addOnFailureListener(callback::onError);
         } catch (SecurityException e) {
-            // Permission was revoked between the check above and the call itself.
             callback.onError(e);
         }
     }

@@ -7,6 +7,12 @@
     <string name="staff_directory_title">Staff directory</string>
     <string name="create_shift_title">New shift</string>
 
+    <!-- Bottom navigation tabs -->
+    <string name="nav_shifts">Shifts</string>
+    <string name="nav_team">Team</string>
+    <string name="nav_feed">Feed</string>
+    <string name="nav_my_shifts">My Shifts</string>
+
     <!-- Empty states -->
     <string name="empty_shifts_manager">No shifts yet.\nTap + to publish the first one.</string>
     <string name="empty_shifts_employee">No shifts available right now.\nCheck back later.</string>
@@ -23,6 +29,7 @@
     <string name="action_save">Save shift</string>
     <string name="action_add_employee">Add employee</string>
     <string name="action_use_my_location">Use my current location</string>
+    <string name="action_check_in">Check in</string>
     <string name="action_logout">Log out</string>
     <string name="action_delete_shift">Delete shift</string>
 
@@ -52,6 +59,10 @@
     <string name="msg_location_permission_needed">Location permission is needed to show how far a shift is.</string>
     <string name="msg_location_unavailable">Could not get your location right now.</string>
     <string name="msg_location_captured">Location captured</string>
+    <string name="msg_checked_in">Checked in</string>
+    <string name="format_checked_in">Checked in %1$s</string>
+    <string name="format_checked_in_distance">Checked in %1$s · %2$d m from site</string>
+    <string name="format_manager_checked_in">Checked in %1$s</string>
 
     <!-- Confirmations -->
     <string name="confirm_delete_shift">This will also remove everyone who signed up for this shift. Delete it?</string>

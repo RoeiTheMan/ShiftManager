@@ -66,6 +66,10 @@ public class StaffDirectoryActivity extends AppCompatActivity
         rvStaff.setAdapter(adapter);
 
         findViewById(R.id.fabAddEmployee).setOnClickListener(v -> showAddEmployeeDialog());
+
+        // "Shifts" returns to the dashboard. finish() rather than starting a new
+        // MainActivity, so tabbing back and forth cannot stack up copies of the screen.
+        findViewById(R.id.navShifts).setOnClickListener(v -> finish());
     }
 
     @Override

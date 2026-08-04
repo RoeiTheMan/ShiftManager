@@ -19,13 +19,20 @@ import java.util.List;
  */
 public class MyShiftsAdapter extends RecyclerView.Adapter<MyShiftsAdapter.MyShiftViewHolder> {
 
+    /** Lets the screen do the GPS work; the adapter only knows a button was pressed. */
+    public interface OnCheckInListener {
+        void onCheckIn(Registration registration);
+    }
+
     private static final String COLOUR_APPROVED = "#2E7D32";
     private static final String COLOUR_PENDING = "#EF6C00";
 
     private final List<Registration> registrations;
+    private final OnCheckInListener listener;
 
-    public MyShiftsAdapter(List<Registration> registrations) {
+    public MyShiftsAdapter(List<Registration> registrations, OnCheckInListener listener) {
         this.registrations = registrations;
+        this.listener = listener;
     }
 
     @NonNull
@@ -68,6 +75,40 @@ public class MyShiftsAdapter extends RecyclerView.Adapter<MyShiftsAdapter.MyShif
             holder.tvStatus.setText(R.string.format_pending_label);
             holder.tvStatus.setTextColor(Color.parseColor(COLOUR_PENDING));
         }
+
+        bindCheckIn(holder, registration);
+    }
+
+    /**
+     * Shows the check-in button, the recorded check-in, or neither.
+     *
+     * Only an approved employee sees the button: somebody still waiting on the manager has
+     * not been given the shift, so there is nothing for them to arrive at yet.
+     */
+    private void bindCheckIn(MyShiftViewHolder holder, Registration registration) {
+        if (registration.isCheckedIn()) {
+            holder.btnCheckIn.setVisibility(View.GONE);
+            holder.tvCheckedIn.setVisibility(View.VISIBLE);
+
+            int distance = registration.getCheckInDistanceMetres();
+            // Distance is -1 when the shift had no saved position to compare against, so
+            // there is nothing honest to report about how close they were.
+            holder.tvCheckedIn.setText(distance >= 0
+                    ? holder.itemView.getContext().getString(
+                            R.string.format_checked_in_distance,
+                            registration.getCheckInTimeText(), distance)
+                    : holder.itemView.getContext().getString(
+                            R.string.format_checked_in, registration.getCheckInTimeText()));
+            return;
+        }
+
+        holder.tvCheckedIn.setVisibility(View.GONE);
+        holder.btnCheckIn.setVisibility(registration.canCheckIn() ? View.VISIBLE : View.GONE);
+        holder.btnCheckIn.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onCheckIn(registration);
+            }
+        });
     }
 
     @Override
@@ -80,6 +121,8 @@ public class MyShiftsAdapter extends RecyclerView.Adapter<MyShiftsAdapter.MyShif
         final TextView tvWhen;
         final TextView tvWhere;
         final TextView tvStatus;
+        final TextView tvCheckedIn;
+        final android.widget.Button btnCheckIn;
 
         MyShiftViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -87,6 +130,8 @@ public class MyShiftsAdapter extends RecyclerView.Adapter<MyShiftsAdapter.MyShif
             tvWhen = itemView.findViewById(R.id.tvMyShiftWhen);
             tvWhere = itemView.findViewById(R.id.tvMyShiftWhere);
             tvStatus = itemView.findViewById(R.id.tvMyShiftStatus);
+            tvCheckedIn = itemView.findViewById(R.id.tvCheckedIn);
+            btnCheckIn = itemView.findViewById(R.id.btnCheckIn);
         }
     }
 }
