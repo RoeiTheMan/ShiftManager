@@ -4,7 +4,7 @@
     <!-- Shift feed -->
     <string name="shift_title_placeholder">Shift</string>
     <string name="my_shifts_title">My shifts</string>
-    <string name="staff_directory_title">Staff directory</string>
+    <string name="staff_directory_title">Team</string>
     <string name="create_shift_title">New shift</string>
 
     <!-- Bottom navigation tabs -->
@@ -124,6 +124,16 @@
     <string name="error_role_duplicate">You already added that role</string>
     <string name="error_need_one_role">Add at least one staff role</string>
     <string name="msg_business_created">Business created</string>
+
+    <!-- Team screen: inviting and approving -->
+    <string name="action_invite_member">Add someone to the team</string>
+    <string name="action_invite">Send invite</string>
+    <string name="invite_help">They need an account already. They will be asked to accept before they join.</string>
+    <string name="msg_no_account_for_email">Nobody has signed up with that email yet. Ask them to create an account first.</string>
+    <string name="msg_already_member">They are already on your team</string>
+    <string name="msg_already_pending">There is already a pending request for them</string>
+    <string name="msg_invite_sent">Invite sent. They have to accept it.</string>
+    <string name="empty_team">Nobody here yet.\nTap + to add someone, or wait for people to ask to join.</string>
 
     <!-- Per-role staffing on a shift -->
     <string name="shift_who_is_needed">Who do you need?</string>

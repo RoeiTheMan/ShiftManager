@@ -26,15 +26,33 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <!-- The role line, same as every other signed-in screen. Tapping switches business. -->
+    <TextView
+        android:id="@+id/tvHeaderSubtitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginEnd="16dp"
+        android:background="?android:attr/selectableItemBackground"
+        android:paddingTop="2dp"
+        android:paddingBottom="4dp"
+        android:textColor="#757575"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvStaffTitle"
+        tools:text="Manager · Golden Events" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvStaff"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="12dp"
         app:layout_constraintBottom_toTopOf="@id/bottomNavStaff"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvStaffTitle" />
+        app:layout_constraintTop_toBottomOf="@id/tvHeaderSubtitle" />
 
     <!--
         The same two tabs as the manager dashboard. Without them this screen was a dead
@@ -87,7 +105,7 @@
         android:layout_marginStart="32dp"
         android:layout_marginEnd="32dp"
         android:gravity="center"
-        android:text="@string/empty_staff"
+        android:text="@string/empty_team"
         android:textColor="#757575"
         android:textSize="16sp"
         android:visibility="gone"
@@ -96,6 +114,11 @@
         app:layout_constraintStart_toStartOf="@id/rvStaff"
         app:layout_constraintTop_toTopOf="@id/rvStaff" />
 
+    <!--
+        Anchored ABOVE the tab bar, not to the bottom of the screen. Constrained to the
+        parent it sat on top of the Team tab and covered part of it, which the manager
+        dashboard already avoided by anchoring to its own nav bar.
+    -->
     <Button
         android:id="@+id/fabAddEmployee"
         android:layout_width="60dp"
@@ -106,7 +129,7 @@
         android:text="+"
         android:textColor="#FFFFFF"
         android:textSize="30sp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/bottomNavStaff"
         app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
