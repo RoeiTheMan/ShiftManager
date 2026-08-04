@@ -123,14 +123,36 @@
             tools:text="Location captured (32.0853, 34.7818)"
             tools:visibility="visible" />
 
-        <EditText
-            android:id="@+id/etMaxWorkers"
+        <!--
+            Who the shift needs, one row per staff role.
+
+            The rows are built at runtime from the roles this business defined when it was
+            set up, so the form offers waiter/cook/bartender rather than a single headcount.
+            A shift is not "6 people", it is 3 waiters, 1 cook and 2 bartenders.
+        -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="28dp"
+            android:text="@string/shift_who_is_needed"
+            android:textColor="#212121"
+            android:textSize="17sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="@string/shift_who_is_needed_help"
+            android:textColor="#757575"
+            android:textSize="14sp" />
+
+        <LinearLayout
+            android:id="@+id/containerRoleRequirements"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:autofillHints=""
-            android:hint="@string/hint_max_workers"
-            android:inputType="number" />
+            android:orientation="vertical" />
 
         <Button
             android:id="@+id/btnSaveShift"

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    One staff role on the create-shift form: the role's name, and how many are needed.
+    One of these is added for every role the business defined.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingTop="6dp"
+    android:paddingBottom="6dp">
+
+    <TextView
+        android:id="@+id/tvRoleName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textColor="#212121"
+        android:textSize="16sp"
+        tools:text="waiter" />
+
+    <EditText
+        android:id="@+id/etRoleCount"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:autofillHints=""
+        android:gravity="center"
+        android:hint="@string/hint_role_count"
+        android:inputType="number"
+        android:maxLength="3"
+        android:textSize="16sp" />
+
+</LinearLayout>

@@ -73,6 +73,27 @@
             app:layout_constraintTop_toBottomOf="@id/tvDateTime"
             tools:text="Downtown Branch  ·  2.4 km away" />
 
+        <!--
+            The staff roles this shift is looking for.
+
+            The manager sees the counts ("1/3 waiter"); the employee sees only which roles
+            are wanted. Roei's rule: the list of roles is public so people know what they
+            can apply for, but how many of each is the manager's business.
+        -->
+        <TextView
+            android:id="@+id/tvRoles"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textColor="#1976D2"
+            android:textSize="13sp"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvLocation"
+            tools:text="Needs: waiter · cook"
+            tools:visibility="visible" />
+
         <Button
             android:id="@+id/btnAction"
             android:layout_width="wrap_content"
@@ -80,7 +101,7 @@
             android:layout_marginTop="12dp"
             android:textColor="@android:color/white"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvLocation"
+            app:layout_constraintTop_toBottomOf="@id/tvRoles"
             tools:text="Sign up" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

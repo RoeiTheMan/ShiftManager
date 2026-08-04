@@ -49,9 +49,7 @@ public class MyShiftsActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_shifts);
 
-        if (FirebaseAuth.getInstance().getCurrentUser() == null) {
-            startActivity(new Intent(this, LoginActivity.class));
-            finish();
+        if (!SessionUi.requireSession(this)) {
             return;
         }
 
@@ -90,7 +88,8 @@ public class MyShiftsActivity extends AppCompatActivity
         progressMyShifts.setVisibility(View.VISIBLE);
         tvEmptyMyShifts.setVisibility(View.GONE);
 
-        shiftRepository.loadMyShifts(user.getUid(), new Callback<List<Registration>>() {
+        shiftRepository.loadMyShifts(user.getUid(), Session.getBusiness().getId(),
+                new Callback<List<Registration>>() {
             @Override
             public void onSuccess(List<Registration> result) {
                 progressMyShifts.setVisibility(View.GONE);

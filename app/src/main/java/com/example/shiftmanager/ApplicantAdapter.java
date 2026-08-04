@@ -46,7 +46,9 @@ public class ApplicantAdapter extends RecyclerView.Adapter<ApplicantAdapter.Appl
     public void onBindViewHolder(@NonNull ApplicantViewHolder holder, int position) {
         final Registration registration = applicants.get(position);
 
-        holder.tvName.setText(registration.getEmployeeName());
+        // The role matters as much as the name here: the manager is filling specific
+        // slots, so "Dana Levi · waiter" is what they need to decide on.
+        holder.tvName.setText(registration.getNameWithRole());
 
         // Once somebody has checked in, when they arrived is more useful to the manager
         // than the approval status they already know about.

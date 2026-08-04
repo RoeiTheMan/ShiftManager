@@ -34,7 +34,11 @@
     <string name="action_delete_shift">Delete shift</string>
 
     <!-- Create-shift form -->
-    <string name="hint_title">Title (e.g. Evening waiter)</string>
+    <!--
+        The shift's title is the EVENT's name, not a job title. Roei rejected "waiter
+        morning" outright: roles are a separate concept, applied further down the form.
+    -->
+    <string name="hint_title">Event name (e.g. Wedding - Tomer and Maya)</string>
     <string name="hint_description">Description</string>
     <string name="hint_date">Date</string>
     <string name="hint_start_time">Start time</string>
@@ -120,6 +124,16 @@
     <string name="error_role_duplicate">You already added that role</string>
     <string name="error_need_one_role">Add at least one staff role</string>
     <string name="msg_business_created">Business created</string>
+
+    <!-- Per-role staffing on a shift -->
+    <string name="shift_who_is_needed">Who do you need?</string>
+    <string name="shift_who_is_needed_help">How many of each role. Leave a role blank if this shift does not need it.</string>
+    <string name="hint_role_count">0</string>
+    <string name="error_need_one_staffed_role">Enter how many of at least one role</string>
+    <string name="error_business_has_no_roles">This business has no staff roles yet, so there is nothing to staff.</string>
+    <string name="shift_pick_role_title">Which role are you applying for?</string>
+    <string name="msg_role_full">That role is already fully staffed</string>
+    <string name="format_roles_needed">Needs: %1$s</string>
 
     <!-- Header and business switcher -->
     <string name="format_header_role_business">%1$s · %2$s</string>

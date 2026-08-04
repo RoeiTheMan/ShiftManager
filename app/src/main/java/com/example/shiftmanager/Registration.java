@@ -18,8 +18,18 @@ public class Registration {
 
     private final String id;
     private final String shiftId;
+    private final String businessId;
     private final String employeeId;
     private final String employeeName;
+
+    /**
+     * Which staff role they applied for -- waiter, cook, and so on.
+     *
+     * A shift asks for a specific mix (3 waiters, 1 cook), so an application has to say
+     * which slot it is for. Approving somebody is approving them as that role.
+     */
+    private final String role;
+
     private final String status;
     private final String note;
 
@@ -39,13 +49,15 @@ public class Registration {
     @Nullable
     private Shift shift;
 
-    public Registration(String id, String shiftId, String employeeId,
-                        String employeeName, String status, String note,
+    public Registration(String id, String shiftId, String businessId, String employeeId,
+                        String employeeName, String role, String status, String note,
                         long checkedInAt, int checkInDistanceMetres) {
         this.id = id;
         this.shiftId = shiftId;
+        this.businessId = businessId;
         this.employeeId = employeeId;
         this.employeeName = employeeName;
+        this.role = role;
         this.status = status;
         this.note = note;
         this.checkedInAt = checkedInAt;
@@ -57,8 +69,10 @@ public class Registration {
         return new Registration(
                 document.getId(),
                 textOr(document, Constants.FIELD_SHIFT_ID, ""),
+                textOr(document, Constants.FIELD_BUSINESS_ID, ""),
                 textOr(document, Constants.FIELD_EMPLOYEE_ID, ""),
                 textOr(document, Constants.FIELD_EMPLOYEE_NAME, "Unnamed employee"),
+                textOr(document, Constants.FIELD_ROLE, ""),
                 textOr(document, Constants.FIELD_STATUS, Constants.REGISTRATION_PENDING),
                 textOr(document, Constants.FIELD_NOTE, ""),
                 timestampMillis(document, Constants.FIELD_CHECKED_IN_AT),
@@ -90,10 +104,22 @@ public class Registration {
 
     public String getId() { return id; }
     public String getShiftId() { return shiftId; }
+    public String getBusinessId() { return businessId; }
     public String getEmployeeId() { return employeeId; }
     public String getEmployeeName() { return employeeName; }
+    public String getRole() { return role; }
     public String getStatus() { return status; }
     public String getNote() { return note; }
+
+    /**
+     * "Dana Levi · waiter", or just the name for registrations made before roles existed.
+     *
+     * Falling back to the bare name matters: the old test data has no role, and printing
+     * a trailing separator with nothing after it would look like a rendering bug.
+     */
+    public String getNameWithRole() {
+        return role.isEmpty() ? employeeName : employeeName + " · " + role;
+    }
 
     @Nullable
     public Shift getShift() { return shift; }

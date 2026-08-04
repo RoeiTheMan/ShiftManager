@@ -165,7 +165,8 @@ public class MainActivity extends AppCompatActivity implements ShiftAdapter.OnSh
     private void loadShifts() {
         showLoading(true);
 
-        shiftRepository.loadShiftsWithCounts(new Callback<List<Shift>>() {
+        shiftRepository.loadShiftsWithCounts(Session.getBusiness().getId(),
+                new Callback<List<Shift>>() {
             @Override
             public void onSuccess(List<Shift> result) {
                 showLoading(false);

@@ -212,29 +212,52 @@ public class ShiftDetailActivity extends AppCompatActivity
             }
         }
 
-        String text = getString(R.string.format_approved, approved, shift.getMaxWorkers());
+        String text = getString(R.string.format_approved, approved, shift.getTotalNeeded());
         if (pending > 0) {
             text = text + "  ·  " + getString(R.string.format_pending, pending);
         }
         tvCapacity.setText(text);
     }
 
+    /** How many approved people this shift already has in one particular role. */
+    private int approvedInRole(String role) {
+        int count = 0;
+        for (Registration other : applicants) {
+            if (other.isApproved() && other.getRole().equals(role)) {
+                count++;
+            }
+        }
+        return count;
+    }
+
     // ------------------------------------------------- manager decisions
 
     @Override
     public void onApprove(Registration registration) {
-        int approvedSoFar = 0;
-        for (Registration other : applicants) {
-            if (other.isApproved()) {
-                approvedSoFar++;
-            }
-        }
+        String role = registration.getRole();
 
-        // Approving past the shift's capacity would put more people on a shift than the
-        // manager asked for, so the limit is enforced here rather than trusted to the UI.
-        if (shift.getMaxWorkers() > 0 && approvedSoFar >= shift.getMaxWorkers()) {
-            Toast.makeText(this, R.string.msg_shift_full, Toast.LENGTH_SHORT).show();
-            return;
+        // Capacity is per role now, not one headcount. Three waiters being covered must
+        // not block approving the cook, and it must not let a fourth waiter through
+        // either -- so the check is against the slot this person actually applied for.
+        if (!role.isEmpty()) {
+            int needed = shift.getNeededForRole(role);
+            if (needed > 0 && approvedInRole(role) >= needed) {
+                Toast.makeText(this, R.string.msg_role_full, Toast.LENGTH_SHORT).show();
+                return;
+            }
+        } else {
+            // An application from before roles existed: fall back to the shift total.
+            int approvedSoFar = 0;
+            for (Registration other : applicants) {
+                if (other.isApproved()) {
+                    approvedSoFar++;
+                }
+            }
+            int total = shift.getTotalNeeded();
+            if (total > 0 && approvedSoFar >= total) {
+                Toast.makeText(this, R.string.msg_shift_full, Toast.LENGTH_SHORT).show();
+                return;
+            }
         }
 
         shiftRepository.approveRegistration(registration.getId(), new Callback<Void>() {

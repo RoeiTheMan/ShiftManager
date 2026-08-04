@@ -167,12 +167,15 @@ public class ShiftAdapter extends RecyclerView.Adapter<ShiftAdapter.ShiftViewHol
 
     private void bindManagerRow(ShiftViewHolder holder, Shift shift) {
         String approved = holder.itemView.getContext().getString(
-                R.string.format_approved, shift.getApprovedWorkers(), shift.getMaxWorkers());
+                R.string.format_approved, shift.getApprovedWorkers(), shift.getTotalNeeded());
         String pending = holder.itemView.getContext().getString(
                 R.string.format_pending, shift.getPendingWorkers());
 
         holder.tvStatus.setText(shift.getPendingWorkers() > 0 ? approved + "  ·  " + pending : approved);
         holder.tvStatus.setVisibility(View.VISIBLE);
+
+        // The manager gets the breakdown with counts: "0/3 waiter · 1/1 cook".
+        showRoles(holder, shift.getRoleCountsLabel(), false);
 
         holder.btnAction.setText(R.string.action_manage);
         holder.btnAction.setBackgroundColor(Color.parseColor(COLOUR_PRIMARY));
@@ -181,6 +184,9 @@ public class ShiftAdapter extends RecyclerView.Adapter<ShiftAdapter.ShiftViewHol
 
     private void bindEmployeeRow(ShiftViewHolder holder, Shift shift) {
         holder.tvStatus.setVisibility(View.GONE);
+
+        // The employee gets the roles without the numbers.
+        showRoles(holder, shift.getRoleListLabel(), true);
 
         String myStatus = registrationStatuses.get(shift.getId());
         boolean alreadyRegistered = myStatus != null;
@@ -213,6 +219,24 @@ public class ShiftAdapter extends RecyclerView.Adapter<ShiftAdapter.ShiftViewHol
         holder.btnAction.setEnabled(true);
     }
 
+    /**
+     * Draws the roles line, hiding it when a shift has none.
+     *
+     * Shifts created before per-role staffing existed have no roles, and an empty
+     * "Needs:" line would read as a rendering fault rather than as missing data.
+     */
+    private void showRoles(ShiftViewHolder holder, String roles, boolean withPrefix) {
+        if (roles.isEmpty()) {
+            holder.tvRoles.setVisibility(View.GONE);
+            return;
+        }
+
+        holder.tvRoles.setVisibility(View.VISIBLE);
+        holder.tvRoles.setText(withPrefix
+                ? holder.itemView.getContext().getString(R.string.format_roles_needed, roles)
+                : roles);
+    }
+
     @Override
     public int getItemCount() {
         return shiftList.size();
@@ -223,6 +247,7 @@ public class ShiftAdapter extends RecyclerView.Adapter<ShiftAdapter.ShiftViewHol
         final TextView tvDateTime;
         final TextView tvLocation;
         final TextView tvStatus;
+        final TextView tvRoles;
         final Button btnAction;
 
         ShiftViewHolder(@NonNull View itemView) {
@@ -231,6 +256,7 @@ public class ShiftAdapter extends RecyclerView.Adapter<ShiftAdapter.ShiftViewHol
             tvDateTime = itemView.findViewById(R.id.tvDateTime);
             tvLocation = itemView.findViewById(R.id.tvLocation);
             tvStatus = itemView.findViewById(R.id.tvStatus);
+            tvRoles = itemView.findViewById(R.id.tvRoles);
             btnAction = itemView.findViewById(R.id.btnAction);
         }
     }

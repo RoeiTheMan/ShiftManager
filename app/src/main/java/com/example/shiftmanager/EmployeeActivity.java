@@ -10,6 +10,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -160,7 +161,8 @@ public class EmployeeActivity extends AppCompatActivity implements ShiftAdapter.
     private void loadShifts() {
         showLoading(true);
 
-        shiftRepository.loadShiftsWithCounts(new Callback<List<Shift>>() {
+        shiftRepository.loadShiftsWithCounts(Session.getBusiness().getId(),
+                new Callback<List<Shift>>() {
             @Override
             public void onSuccess(List<Shift> result) {
                 shifts.clear();
@@ -246,10 +248,39 @@ public class EmployeeActivity extends AppCompatActivity implements ShiftAdapter.
         }
     }
 
-    private void signUpFor(Shift shift, String employeeId) {
+    /**
+     * Signing up starts by asking which role they are applying for.
+     *
+     * The shift wants a specific mix -- three waiters and one cook, say -- so an
+     * application has to name a slot. The employee sees WHICH roles are wanted but not how
+     * many of each; that half is the manager's to know.
+     */
+    private void signUpFor(final Shift shift, final String employeeId) {
         analytics.logEvent("shift_signup_clicked", null);
 
-        shiftRepository.registerForShift(shift.getId(), employeeId, employeeName,
+        final List<String> roles = new ArrayList<>(shift.getRoleRequirements().keySet());
+        if (roles.isEmpty()) {
+            // A shift published before roles existed, or one asking for nobody. There is
+            // nothing to pick, so record the application with no role rather than blocking.
+            submitSignUp(shift, employeeId, "");
+            return;
+        }
+        if (roles.size() == 1) {
+            submitSignUp(shift, employeeId, roles.get(0)); // no point asking
+            return;
+        }
+
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.shift_pick_role_title)
+                .setItems(roles.toArray(new String[0]), (dialog, which) ->
+                        submitSignUp(shift, employeeId, roles.get(which)))
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
+    }
+
+    private void submitSignUp(Shift shift, String employeeId, String role) {
+        shiftRepository.registerForShift(shift.getId(), Session.getBusiness().getId(),
+                employeeId, employeeName, role,
                 new Callback<String>() {
                     @Override
                     public void onSuccess(String registrationId) {

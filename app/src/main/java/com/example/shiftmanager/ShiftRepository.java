@@ -4,10 +4,10 @@ import androidx.annotation.NonNull;
 
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,15 +36,22 @@ public class ShiftRepository {
      * registrations collection is small for this app, so counting on the fly is simpler
      * and always correct.
      */
-    public void loadShiftsWithCounts(@NonNull final Callback<List<Shift>> callback) {
+    public void loadShiftsWithCounts(@NonNull String businessId,
+                                     @NonNull final Callback<List<Shift>> callback) {
         db.collection(Constants.COLLECTION_SHIFTS)
-                .orderBy(Constants.FIELD_DATE, Query.Direction.ASCENDING)
+                .whereEqualTo(Constants.FIELD_BUSINESS_ID, businessId)
                 .get()
                 .addOnSuccessListener(shiftDocs -> {
                     final List<Shift> shifts = new ArrayList<>();
                     for (QueryDocumentSnapshot document : shiftDocs) {
                         shifts.add(Shift.fromDocument(document));
                     }
+
+                    // Sorted here rather than with orderBy, because combining a where
+                    // clause with an orderBy makes Firestore demand a hand-built composite
+                    // index -- the feed would fail on first open until somebody created it.
+                    // A business has tens of shifts, not thousands, so this costs nothing.
+                    Collections.sort(shifts, (a, b) -> a.getDate().compareTo(b.getDate()));
 
                     if (shifts.isEmpty()) {
                         callback.onSuccess(shifts);
@@ -64,15 +71,22 @@ public class ShiftRepository {
                 .addOnSuccessListener(registrationDocs -> {
                     Map<String, Integer> approved = new HashMap<>();
                     Map<String, Integer> pending = new HashMap<>();
+                    // Keyed "shiftId|role", so one pass counts both the shift totals and
+                    // the per-role breakdown the manager needs.
+                    Map<String, Integer> approvedPerRole = new HashMap<>();
 
                     for (QueryDocumentSnapshot registration : registrationDocs) {
                         String shiftId = registration.getString(Constants.FIELD_SHIFT_ID);
                         String status = registration.getString(Constants.FIELD_STATUS);
+                        String role = registration.getString(Constants.FIELD_ROLE);
                         if (shiftId == null || status == null) {
                             continue;
                         }
                         if (Constants.REGISTRATION_APPROVED.equals(status)) {
                             increment(approved, shiftId);
+                            if (role != null) {
+                                increment(approvedPerRole, shiftId + "|" + role);
+                            }
                         } else if (Constants.REGISTRATION_PENDING.equals(status)) {
                             increment(pending, shiftId);
                         }
@@ -83,6 +97,11 @@ public class ShiftRepository {
                         Integer p = pending.get(shift.getId());
                         shift.setApprovedWorkers(a != null ? a : 0);
                         shift.setPendingWorkers(p != null ? p : 0);
+
+                        for (String role : shift.getRoleRequirements().keySet()) {
+                            Integer perRole = approvedPerRole.get(shift.getId() + "|" + role);
+                            shift.setApprovedForRole(role, perRole != null ? perRole : 0);
+                        }
                     }
 
                     callback.onSuccess(shifts);
@@ -119,6 +138,7 @@ public class ShiftRepository {
     /** Saves a brand new shift and hands back its generated id. */
     public void createShift(@NonNull Shift shift, @NonNull final Callback<String> callback) {
         Map<String, Object> data = new HashMap<>();
+        data.put(Constants.FIELD_BUSINESS_ID, shift.getBusinessId());
         data.put(Constants.FIELD_TITLE, shift.getTitle());
         data.put(Constants.FIELD_DESCRIPTION, shift.getDescription());
         data.put(Constants.FIELD_DATE, shift.getDate());
@@ -127,7 +147,7 @@ public class ShiftRepository {
         data.put(Constants.FIELD_LOCATION, shift.getLocation());
         data.put(Constants.FIELD_LATITUDE, shift.getLatitude());
         data.put(Constants.FIELD_LONGITUDE, shift.getLongitude());
-        data.put(Constants.FIELD_MAX_WORKERS, shift.getMaxWorkers());
+        data.put(Constants.FIELD_ROLE_REQUIREMENTS, shift.getRoleRequirements());
         data.put(Constants.FIELD_STATUS, Constants.SHIFT_OPEN);
         data.put(Constants.FIELD_CREATED_BY, shift.getCreatedBy());
         // Server time, not the phone's: a device with a wrong clock would otherwise
@@ -192,11 +212,20 @@ public class ShiftRepository {
                 .addOnFailureListener(callback::onError);
     }
 
-    /** Every registration this employee holds, with the shift attached, for "My shifts". */
+    /**
+     * This employee's registrations in ONE business, with the shift attached, for
+     * "My shifts".
+     *
+     * Scoped to the business rather than showing everything they hold everywhere, so the
+     * screen matches the business named in the header. Somebody who works for three
+     * caterers switches business to see the other two.
+     */
     public void loadMyShifts(@NonNull final String employeeId,
+                             @NonNull final String businessId,
                              @NonNull final Callback<List<Registration>> callback) {
         db.collection(Constants.COLLECTION_REGISTRATIONS)
                 .whereEqualTo(Constants.FIELD_EMPLOYEE_ID, employeeId)
+                .whereEqualTo(Constants.FIELD_BUSINESS_ID, businessId)
                 .get()
                 .addOnSuccessListener(documents -> {
                     final List<Registration> registrations = new ArrayList<>();
@@ -262,15 +291,25 @@ public class ShiftRepository {
                 .addOnFailureListener(callback::onError);
     }
 
-    /** An employee applies for a shift. The registration starts out "pending". */
+    /**
+     * An employee applies for a shift, for one specific role. Starts out "pending".
+     *
+     * The role is stored on the registration rather than worked out later, because a
+     * person who can do two jobs has to say which one they are applying for -- the manager
+     * is filling three waiter slots and one cook slot, not four interchangeable bodies.
+     */
     public void registerForShift(@NonNull String shiftId,
+                                 @NonNull String businessId,
                                  @NonNull String employeeId,
                                  @NonNull String employeeName,
+                                 @NonNull String role,
                                  @NonNull final Callback<String> callback) {
         Map<String, Object> data = new HashMap<>();
         data.put(Constants.FIELD_SHIFT_ID, shiftId);
+        data.put(Constants.FIELD_BUSINESS_ID, businessId);
         data.put(Constants.FIELD_EMPLOYEE_ID, employeeId);
         data.put(Constants.FIELD_EMPLOYEE_NAME, employeeName);
+        data.put(Constants.FIELD_ROLE, role);
         data.put(Constants.FIELD_STATUS, Constants.REGISTRATION_PENDING);
         data.put(Constants.FIELD_NOTE, "");
         data.put(Constants.FIELD_CREATED_AT, FieldValue.serverTimestamp());
