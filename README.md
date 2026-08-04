@@ -77,6 +77,7 @@ shifts/{shiftId}
 
 shiftRegistrations/{registrationId}
     shiftId · employeeId · employeeName · status · note · createdAt
+    checkedInAt · checkInLatitude · checkInLongitude · checkInDistanceMetres
 ```
 
 **Why registrations are their own collection.** A sign-up is not a property of a shift or
@@ -143,15 +144,30 @@ apart. Now the screens only handle what is on screen and the repositories own th
 
 ---
 
-## The phone capability: GPS
+## The phone capability: GPS check-in
 
-When publishing a shift the manager can tap **Use my current location**, which stamps the
-shift with the phone's coordinates. Both feeds then show how far each shift is from where
-the user is standing — the thing an employee actually wants to know when deciding whether
-a shift is worth travelling to.
+An approved employee taps **Check in** when they start their shift. The app records the
+server's time and the phone's position on their registration, and the manager sees the
+check-in time next to their name on the approval screen. That replaces the paper timesheet
+with something the manager can actually verify.
+
+Publishing a shift can also stamp it with a position (**Use my current location**), which
+is optional. When a shift has one, two extra things happen: the feeds show how far each
+shift is from the user, and a check-in records the distance from the site — so a manager
+can tell an arrival at work from one on the sofa. When a shift has no position, the
+distance is stored as `-1` and simply not shown, rather than a misleading zero.
+
+Check-in was deliberately chosen over stamping a location on every shift. Most small
+businesses work from one address, so per-shift coordinates say very little; when somebody
+actually turned up says a lot.
 
 Location is requested at runtime, not just declared in the manifest. If the user refuses,
 nothing breaks: the distance line stays empty and every other feature carries on.
+
+The lookup asks GPS directly (`PRIORITY_HIGH_ACCURACY`) and falls back to the last known
+position. An earlier version used the balanced-power setting, which leans on wifi and
+mobile-network positioning — a request could sit unanswered indefinitely, which made the
+feature look broken when it was not.
 
 ---
 
