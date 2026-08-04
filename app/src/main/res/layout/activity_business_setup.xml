@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Sign-up step 2: which business.
+
+    With the search box empty the list shows the businesses this person is already linked
+    to. Typing turns the same list into a search across every business in the app, so it
+    narrows as they type, which is how somebody finds a business they have not joined.
+-->
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF"
+    tools:context=".BusinessSetupActivity">
+
+    <TextView
+        android:id="@+id/tvSetupTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="48dp"
+        android:text="@string/business_setup_title"
+        android:textColor="#1976D2"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tvSetupSubtitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="6dp"
+        android:layout_marginEnd="24dp"
+        android:textColor="#757575"
+        android:textSize="15sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvSetupTitle"
+        tools:text="Create your business, or join one that already exists." />
+
+    <Button
+        android:id="@+id/btnCreateBusiness"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="24dp"
+        android:backgroundTint="#1976D2"
+        android:paddingTop="14dp"
+        android:paddingBottom="14dp"
+        android:text="@string/action_create_new_business"
+        android:textColor="#FFFFFF"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvSetupSubtitle" />
+
+    <EditText
+        android:id="@+id/etSearchBusiness"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="24dp"
+        android:hint="@string/hint_search_business"
+        android:imeOptions="actionSearch"
+        android:inputType="text"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btnCreateBusiness" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvBusinesses"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="12dp"
+        app:layout_constraintBottom_toTopOf="@id/btnLogoutSetup"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/etSearchBusiness" />
+
+    <ProgressBar
+        android:id="@+id/progressSetup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/rvBusinesses"
+        app:layout_constraintEnd_toEndOf="@id/rvBusinesses"
+        app:layout_constraintStart_toStartOf="@id/rvBusinesses"
+        app:layout_constraintTop_toTopOf="@id/rvBusinesses" />
+
+    <TextView
+        android:id="@+id/tvEmptyBusinesses"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
+        android:gravity="center"
+        android:textColor="#757575"
+        android:textSize="16sp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/rvBusinesses"
+        app:layout_constraintEnd_toEndOf="@id/rvBusinesses"
+        app:layout_constraintStart_toStartOf="@id/rvBusinesses"
+        app:layout_constraintTop_toTopOf="@id/rvBusinesses"
+        tools:text="You are not in a business yet." />
+
+    <!-- Without this, somebody who picked the wrong role has no way off this screen. -->
+    <Button
+        android:id="@+id/btnLogoutSetup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:background="@android:color/transparent"
+        android:text="@string/action_logout"
+        android:textColor="#757575"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

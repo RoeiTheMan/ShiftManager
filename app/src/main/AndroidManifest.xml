@@ -34,6 +34,11 @@
             </intent-filter>
         </activity>
 
+        <!-- Sign-up: who you are, then which business you belong to -->
+        <activity android:name=".ProfileSetupActivity" />
+        <activity android:name=".BusinessSetupActivity" />
+        <activity android:name=".CreateBusinessActivity" />
+
         <!-- Manager side -->
         <activity android:name=".MainActivity" />
         <activity android:name=".CreateShiftActivity" />

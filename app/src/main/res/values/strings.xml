@@ -73,6 +73,54 @@
     <string name="error_workers_positive">Must be at least 1</string>
     <string name="error_end_before_start">End time must be after the start time</string>
 
+    <!-- Sign-up step 1: the person -->
+    <string name="profile_setup_title">Tell us about you</string>
+    <string name="profile_setup_subtitle">This is how your name appears to your team when you sign up for shifts.</string>
+    <string name="profile_role_question">What do you do?</string>
+    <string name="profile_role_manager">I manage a business</string>
+    <string name="profile_role_employee">I work shifts</string>
+    <string name="profile_admin_recognised">You are signed in as the app owner, so you get the admin view.</string>
+    <string name="hint_full_name">Full name</string>
+
+    <!-- Sign-up step 2: the business -->
+    <string name="business_setup_title">Your business</string>
+    <string name="business_setup_subtitle_manager">Create your business, or search for one that already exists.</string>
+    <string name="business_setup_subtitle_employee">Search for the business you work for and ask to join. A manager approves it.</string>
+    <string name="hint_search_business">Search businesses by name</string>
+    <string name="action_create_new_business">Create a new business</string>
+    <string name="action_request_join">Request to join</string>
+    <string name="action_accept">Accept</string>
+    <string name="action_decline">Decline</string>
+    <string name="action_continue">Continue</string>
+    <string name="business_status_member">Member</string>
+    <string name="business_status_invited">Invited</string>
+    <string name="business_status_waiting">Waiting</string>
+    <string name="business_status_join">Tap to join</string>
+    <string name="empty_no_businesses">You are not in a business yet.\nSearch for one above to ask to join.</string>
+    <string name="empty_no_search_results">No business by that name.</string>
+    <string name="confirm_request_join">Ask a manager of %1$s to add you to their team?</string>
+    <string name="confirm_accept_invite">%1$s added you to their team. Join them?</string>
+    <string name="msg_join_requested">Request sent. A manager has to approve it.</string>
+    <string name="msg_still_waiting">Still waiting for a manager to approve you.</string>
+    <string name="msg_invite_declined">Invitation declined</string>
+
+    <!-- Creating a business -->
+    <string name="create_business_title">New business</string>
+    <string name="hint_business_name">Business name</string>
+    <string name="hint_business_type">Type (e.g. catering, restaurant)</string>
+    <string name="hint_business_address">Address</string>
+    <string name="hint_business_description">Short description</string>
+    <string name="business_staff_roles_title">Staff roles</string>
+    <string name="business_staff_roles_help">The jobs people do here — waiter, cook, bartender. You pick from these when you say who a shift needs.</string>
+    <string name="hint_new_role">Add a role</string>
+    <string name="business_no_roles_yet">No roles added yet.</string>
+    <string name="action_add">Add</string>
+    <string name="action_remove_last_role">Remove last</string>
+    <string name="action_create_business">Create business</string>
+    <string name="error_role_duplicate">You already added that role</string>
+    <string name="error_need_one_role">Add at least one staff role</string>
+    <string name="msg_business_created">Business created</string>
+
     <!-- Formats -->
     <string name="format_approved">Approved %1$d/%2$d</string>
     <string name="format_pending">Pending %1$d</string>

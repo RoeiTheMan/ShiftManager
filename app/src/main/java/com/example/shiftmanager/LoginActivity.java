@@ -8,7 +8,6 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -23,11 +22,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -37,6 +32,9 @@ public class LoginActivity extends AppCompatActivity {
     private FirebaseFirestore db;
     private FirebaseAnalytics analytics;
     private GoogleSignInClient googleSignInClient;
+
+    private final MembershipRepository membershipRepository = new MembershipRepository();
+    private final BusinessRepository businessRepository = new BusinessRepository();
 
     private EditText etEmail, etPassword;
     private Button btnLogin, btnRegister, btnGoogleSignIn;
@@ -197,81 +195,117 @@ public class LoginActivity extends AppCompatActivity {
                 });
     }
 
-    // ---------- Role handling & routing ----------
+    // ---------- Routing ----------
 
+    /**
+     * Decides where a signed-in person lands, in three steps.
+     *
+     * No profile at all means a brand new account, which goes to the sign-up screens.
+     * A profile with no approved business means they registered but have not been let
+     * into a team yet, so they go back to the business screen. Only somebody who is both
+     * a known person and an approved member of a business reaches a shift feed.
+     *
+     * Getting this order right is the whole point of the rewrite: the app used to drop a
+     * new account straight onto an empty dashboard belonging to nothing.
+     */
     private void routeUser(FirebaseUser user) {
         setLoading(true);
         db.collection(Constants.COLLECTION_USERS).document(user.getUid())
                 .get()
                 .addOnSuccessListener(snapshot -> {
-                    if (snapshot.exists()) {
-                        openHomeForRole(snapshot);
-                    } else {
-                        askForRole(user);
+                    if (!snapshot.exists()) {
+                        openProfileSetup();
+                        return;
                     }
+                    AppUser appUser = AppUser.fromDocument(snapshot);
+                    Session.setUser(appUser);
+                    resolveBusiness(appUser);
                 })
                 .addOnFailureListener(e -> {
                     setLoading(false);
                     FirebaseCrashlytics.getInstance().recordException(e);
-                    Toast.makeText(LoginActivity.this, "Failed to load your profile, try again", Toast.LENGTH_LONG).show();
+                    Toast.makeText(LoginActivity.this,
+                            "Failed to load your profile, try again", Toast.LENGTH_LONG).show();
                 });
     }
 
-    private void askForRole(FirebaseUser user) {
-        setLoading(false);
-        final String[] roles = {"Manager", "Employee"};
-        new AlertDialog.Builder(this)
-                .setTitle("Welcome! What is your role?")
-                .setCancelable(false)
-                .setItems(roles, (dialog, which) -> {
-                    String role = which == 0 ? Constants.ROLE_MANAGER : Constants.ROLE_EMPLOYEE;
-                    createUserProfile(user, role);
-                })
-                .show();
-    }
+    /**
+     * Works out which business to open, from the ones this person has actually been
+     * approved for.
+     *
+     * The stored choice is checked against that list rather than trusted, because a
+     * manager can remove somebody after they last used the app -- and reopening a business
+     * they are no longer in would show them a team they have been taken out of.
+     */
+    private void resolveBusiness(final AppUser appUser) {
+        membershipRepository.loadMembershipsForUser(appUser.getId(),
+                new Callback<java.util.List<Membership>>() {
+                    @Override
+                    public void onSuccess(java.util.List<Membership> memberships) {
+                        java.util.List<String> approvedIds = new java.util.ArrayList<>();
+                        for (Membership membership : memberships) {
+                            if (membership.isApproved()) {
+                                approvedIds.add(membership.getBusinessId());
+                            }
+                        }
 
-    private void createUserProfile(FirebaseUser user, String role) {
-        setLoading(true);
-        String name = user.getDisplayName();
-        if (name == null || name.isEmpty()) {
-            String email = user.getEmail() != null ? user.getEmail() : "user";
-            name = email.contains("@") ? email.substring(0, email.indexOf('@')) : email;
-        }
+                        if (approvedIds.isEmpty()) {
+                            openBusinessSetup();
+                            return;
+                        }
 
-        Map<String, Object> profile = new HashMap<>();
-        profile.put(Constants.FIELD_NAME, name);
-        profile.put(Constants.FIELD_EMAIL, user.getEmail());
-        profile.put(Constants.FIELD_ROLE, role);
-        profile.put(Constants.FIELD_ACTIVE, true);
-        profile.put(Constants.FIELD_CREATED_AT,
-                com.google.firebase.firestore.FieldValue.serverTimestamp());
+                        String target = appUser.getActiveBusinessId();
+                        if (target.isEmpty() || !approvedIds.contains(target)) {
+                            target = approvedIds.get(0);
+                        }
+                        openBusiness(appUser, target);
+                    }
 
-        db.collection(Constants.COLLECTION_USERS).document(user.getUid())
-                .set(profile)
-                .addOnSuccessListener(unused -> {
-                    analytics.logEvent("role_selected_" + role, null);
-                    FirebaseCrashlytics.getInstance().log("User profile created with role " + role);
-                    openHome(role);
-                })
-                .addOnFailureListener(e -> {
-                    setLoading(false);
-                    FirebaseCrashlytics.getInstance().recordException(e);
-                    Toast.makeText(LoginActivity.this, "Failed to save your profile, try again", Toast.LENGTH_LONG).show();
+                    @Override
+                    public void onError(Exception e) {
+                        setLoading(false);
+                        FirebaseCrashlytics.getInstance().recordException(e);
+                        Toast.makeText(LoginActivity.this,
+                                R.string.msg_load_failed, Toast.LENGTH_LONG).show();
+                    }
                 });
     }
 
-    private void openHomeForRole(DocumentSnapshot userDoc) {
-        String role = userDoc.getString(Constants.FIELD_ROLE);
-        openHome(role != null ? role : Constants.ROLE_EMPLOYEE);
+    private void openBusiness(final AppUser appUser, final String businessId) {
+        businessRepository.loadBusiness(businessId, new Callback<Business>() {
+            @Override
+            public void onSuccess(Business business) {
+                Session.setBusiness(business);
+                openHome(appUser);
+            }
+
+            @Override
+            public void onError(Exception e) {
+                // The business was deleted out from under them. Sending them to the
+                // business screen is better than a dead dashboard with no data.
+                setLoading(false);
+                openBusinessSetup();
+            }
+        });
     }
 
-    private void openHome(String role) {
-        Intent intent;
-        if (Constants.ROLE_MANAGER.equals(role)) {
-            intent = new Intent(this, MainActivity.class);
-        } else {
-            intent = new Intent(this, EmployeeActivity.class);
-        }
+    private void openProfileSetup() {
+        startActivity(new Intent(this, ProfileSetupActivity.class));
+        finish();
+    }
+
+    private void openBusinessSetup() {
+        startActivity(new Intent(this, BusinessSetupActivity.class));
+        finish();
+    }
+
+    private void openHome(AppUser appUser) {
+        analytics.logEvent("home_opened_" + appUser.getRole(), null);
+
+        Intent intent = new Intent(this,
+                appUser.isManager() || appUser.isAdmin()
+                        ? MainActivity.class
+                        : EmployeeActivity.class);
         startActivity(intent);
         finish(); // don't keep the login screen behind the app
     }

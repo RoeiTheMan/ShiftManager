@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- One business in the join list or the switcher. -->
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?android:attr/selectableItemBackground"
+    android:paddingStart="16dp"
+    android:paddingTop="14dp"
+    android:paddingEnd="16dp"
+    android:paddingBottom="14dp">
+
+    <TextView
+        android:id="@+id/tvBusinessName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textColor="#212121"
+        android:textSize="17sp"
+        app:layout_constraintEnd_toStartOf="@id/tvBusinessStatus"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Golden Events" />
+
+    <TextView
+        android:id="@+id/tvBusinessSubtitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:textColor="#757575"
+        android:textSize="13sp"
+        app:layout_constraintEnd_toStartOf="@id/tvBusinessStatus"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvBusinessName"
+        tools:text="Catering · Tel Aviv" />
+
+    <TextView
+        android:id="@+id/tvBusinessStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:textSize="13sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Member" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

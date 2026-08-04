@@ -127,9 +127,12 @@ public final class Constants {
     public static final String MEMBERSHIP_REJECTED = "rejected";
 
     // Who started the request -- this is what makes the approval run the right way round.
-    // An employee asking to join is approved by the manager; a manager adding someone is
-    // approved by that employee. Same document, opposite directions.
-    public static final String REQUESTED_BY_EMPLOYEE = "employee";
+    // Somebody asking to join is approved by a manager of that business; somebody a
+    // manager added is approved by that person. Same document, opposite directions.
+    //
+    // "joiner" rather than "employee" because a NEW MANAGER joining an existing business
+    // is the same direction as an employee joining: they asked, a manager answers.
+    public static final String REQUESTED_BY_JOINER = "joiner";
     public static final String REQUESTED_BY_MANAGER = "manager";
 
     // ---------- Intent extras used when moving between screens ----------

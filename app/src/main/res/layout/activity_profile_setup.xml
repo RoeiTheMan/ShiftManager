@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Sign-up step 1: who are you.
+
+    Registration previously collected nothing beyond an email and a password, so the app
+    could not show a name anywhere and did not know what the person did. This screen fixes
+    both before the user reaches anything else.
+-->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF"
+    android:fillViewport="true"
+    tools:context=".ProfileSetupActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingStart="24dp"
+        android:paddingTop="56dp"
+        android:paddingEnd="24dp"
+        android:paddingBottom="24dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/profile_setup_title"
+            android:textColor="#1976D2"
+            android:textSize="26sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/profile_setup_subtitle"
+            android:textColor="#757575"
+            android:textSize="15sp" />
+
+        <EditText
+            android:id="@+id/etFullName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:autofillHints="name"
+            android:hint="@string/hint_full_name"
+            android:inputType="textPersonName|textCapWords"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/tvRoleQuestion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="36dp"
+            android:text="@string/profile_role_question"
+            android:textColor="#212121"
+            android:textSize="17sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnIAmManager"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:backgroundTint="#1976D2"
+            android:paddingTop="14dp"
+            android:paddingBottom="14dp"
+            android:text="@string/profile_role_manager"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/btnIAmEmployee"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:backgroundTint="#1976D2"
+            android:paddingTop="14dp"
+            android:paddingBottom="14dp"
+            android:text="@string/profile_role_employee"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp" />
+
+        <!-- Shown instead of the two role buttons when the owner signs in. -->
+        <Button
+            android:id="@+id/btnContinueAdmin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:backgroundTint="#1976D2"
+            android:paddingTop="14dp"
+            android:paddingBottom="14dp"
+            android:text="@string/action_continue"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"
+            android:visibility="gone" />
+
+        <ProgressBar
+            android:id="@+id/progressProfile"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="24dp"
+            android:visibility="gone" />
+
+    </LinearLayout>
+
+</ScrollView>

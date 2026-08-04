@@ -56,7 +56,7 @@ public class Membership {
                 userEmail != null ? userEmail : "",
                 userRole != null ? userRole : Constants.ROLE_EMPLOYEE,
                 status != null ? status : Constants.MEMBERSHIP_PENDING,
-                requestedBy != null ? requestedBy : Constants.REQUESTED_BY_EMPLOYEE
+                requestedBy != null ? requestedBy : Constants.REQUESTED_BY_JOINER
         );
     }
 
@@ -79,7 +79,7 @@ public class Membership {
 
     /** True when this request is still waiting on a manager to answer it. */
     public boolean isWaitingOnManager() {
-        return isPending() && Constants.REQUESTED_BY_EMPLOYEE.equals(requestedBy);
+        return isPending() && Constants.REQUESTED_BY_JOINER.equals(requestedBy);
     }
 
     /** True when this request is still waiting on the invited employee to answer it. */
