@@ -86,6 +86,10 @@ public class ShiftDetailActivity extends AppCompatActivity
 
         btnDeleteShift.setOnClickListener(v -> confirmDeleteShift());
 
+        // Back to whichever feed opened this shift. finish() rather than starting a
+        // screen, so the caller is returned to instead of a second copy being stacked.
+        findViewById(R.id.btnBack).setOnClickListener(v -> finish());
+
         loadViewerRole(user.getUid());
     }
 

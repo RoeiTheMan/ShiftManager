@@ -76,6 +76,10 @@ public class CreateShiftActivity extends AppCompatActivity {
         buildRoleRows();
         setUpPickers();
         setUpButtons();
+
+        // A visible way out. The system back gesture already worked, but it is not
+        // discoverable, so the form read as a screen you could only leave by saving.
+        findViewById(R.id.btnBack).setOnClickListener(v -> finish());
     }
 
     private void bindViews() {

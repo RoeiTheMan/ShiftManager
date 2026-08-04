@@ -31,6 +31,13 @@
     <string name="action_use_my_location">Use my current location</string>
     <string name="action_check_in">Check in</string>
     <string name="action_logout">Log out</string>
+    <!--
+        Every screen you can get into needs a visible way out. The system back gesture
+        works but is not discoverable, which Roei hit on 2026-08-04: Google sign-in landed
+        him on the sign-up screen with no back and no log out, and he was stuck there.
+    -->
+    <string name="action_back">← Back</string>
+    <string name="action_back_to_login">← Back to sign in</string>
     <string name="action_delete_shift">Delete shift</string>
 
     <!-- Create-shift form -->

@@ -68,6 +68,10 @@ public class CreateBusinessActivity extends AppCompatActivity {
         btnRemoveLastRole.setOnClickListener(v -> removeLastRole());
         btnSaveBusiness.setOnClickListener(v -> saveBusiness());
 
+        // Returns to the business screen. Without it, a manager who opened this form by
+        // mistake could only leave by creating a business they did not want.
+        findViewById(R.id.btnBack).setOnClickListener(v -> finish());
+
         renderRoles();
     }
 

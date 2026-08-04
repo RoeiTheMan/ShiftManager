@@ -23,6 +23,24 @@
         android:paddingEnd="24dp"
         android:paddingBottom="24dp">
 
+        <!--
+            Signs out and returns to the login screen. "Back" from half-finished sign-up
+            means abandoning it, so the label says where it actually goes rather than
+            implying there is a previous step to return to.
+        -->
+        <TextView
+            android:id="@+id/btnBack"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:paddingTop="8dp"
+            android:paddingEnd="12dp"
+            android:paddingBottom="8dp"
+            android:text="@string/action_back_to_login"
+            android:textColor="#1976D2"
+            android:textSize="16sp" />
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

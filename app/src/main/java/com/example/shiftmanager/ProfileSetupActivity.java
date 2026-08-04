@@ -63,6 +63,15 @@ public class ProfileSetupActivity extends AppCompatActivity {
             etFullName.setText(suggestedName);
         }
 
+        // Backing out of a half-finished sign-up means abandoning it, so this signs out
+        // rather than just closing the screen. Without it somebody who signed in with
+        // Google and changed their mind is stuck here: there is no previous screen to
+        // return to, and no log out on this screen either.
+        findViewById(R.id.btnBack).setOnClickListener(v -> {
+            FirebaseAuth.getInstance().signOut();
+            goToLogin();
+        });
+
         String email = authUser.getEmail() != null ? authUser.getEmail() : "";
 
         // The app owner does not get asked what their role is -- it is decided by the
