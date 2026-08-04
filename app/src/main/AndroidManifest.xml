@@ -51,6 +51,9 @@
         <!-- Opened by both roles: the manager can approve here, the employee reads only -->
         <activity android:name=".ShiftDetailActivity" />
 
+        <!-- Admin side: the app owner's overview of every business and account -->
+        <activity android:name=".AdminActivity" />
+
     </application>
 
 </manifest>

@@ -102,9 +102,13 @@ public class ProfileSetupActivity extends AppCompatActivity {
                         Session.setUser(createdUser);
 
                         // Straight on to picking a business -- a profile on its own still
-                        // belongs to nothing, which was the original complaint.
+                        // belongs to nothing, which was the original complaint. The admin
+                        // is the exception: they oversee every business rather than
+                        // working in one, so there is nothing for them to pick.
                         startActivity(new Intent(ProfileSetupActivity.this,
-                                BusinessSetupActivity.class));
+                                createdUser.isAdmin()
+                                        ? AdminActivity.class
+                                        : BusinessSetupActivity.class));
                         finish();
                     }
 

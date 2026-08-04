@@ -35,8 +35,23 @@ public final class SessionUi {
      * so both are checked and a rebuild is routed through login rather than guessed at.
      */
     public static boolean requireSession(@NonNull AppCompatActivity activity) {
+        return require(activity, true);
+    }
+
+    /**
+     * The same guard for screens that need a signed-in person but no business.
+     *
+     * The admin screen is the one that needs this: the app's owner belongs to no business,
+     * so requireSession would bounce them to the login screen forever.
+     */
+    public static boolean requireUser(@NonNull AppCompatActivity activity) {
+        return require(activity, false);
+    }
+
+    private static boolean require(@NonNull AppCompatActivity activity, boolean needsBusiness) {
         boolean signedIn = FirebaseAuth.getInstance().getCurrentUser() != null;
-        if (signedIn && Session.isReady()) {
+        boolean sessionOk = needsBusiness ? Session.isReady() : Session.hasUser();
+        if (signedIn && sessionOk) {
             return true;
         }
 

@@ -150,6 +150,23 @@
     <string name="switcher_title">Switch business</string>
     <string name="action_join_another">Join another business…</string>
 
+    <!-- Admin screen: the app owner's overview -->
+    <string name="admin_title">All businesses</string>
+    <string name="admin_no_business_group">Not in any business</string>
+    <string name="admin_status_no_business">No business</string>
+    <string name="empty_admin">No businesses and no accounts yet.</string>
+    <string name="format_admin_summary">Admin · %1$s · %2$s</string>
+    <string name="action_close">Close</string>
+    <string name="action_send_password_reset">Send password reset</string>
+    <!--
+        Says plainly why there is no password here. Firebase Auth stores a salted hash and
+        gives the original back to nobody, the app's owner included, so the honest answer
+        belongs on screen rather than as an unexplained missing field.
+    -->
+    <string name="admin_person_details">Email: %1$s\nRole: %2$s\nAccount created: %3$s\n\nPasswords cannot be shown to anyone, including the app owner — Firebase stores them only as a one-way hash. Send a reset email instead.</string>
+    <string name="msg_password_reset_sent">Password reset email sent</string>
+    <string name="msg_password_reset_failed">Could not send a reset email. The account may sign in with Google only.</string>
+
     <!-- Formats -->
     <string name="format_approved">Approved %1$d/%2$d</string>
     <string name="format_pending">Pending %1$d</string>
@@ -157,4 +174,21 @@
     <string name="format_distance_km">%1$.1f km away</string>
     <string name="format_distance_m">%1$d m away</string>
     <string name="format_applicant_status">Status: %1$s</string>
+
+    <!--
+        Counts on the admin screen. Plurals rather than "%d person(s)": Android picks the
+        right wording per language, and "1 people" reads like a bug.
+    -->
+    <plurals name="admin_people_count">
+        <item quantity="one">%d person</item>
+        <item quantity="other">%d people</item>
+    </plurals>
+    <plurals name="admin_business_count">
+        <item quantity="one">%d business</item>
+        <item quantity="other">%d businesses</item>
+    </plurals>
+    <plurals name="admin_account_count">
+        <item quantity="one">%d account</item>
+        <item quantity="other">%d accounts</item>
+    </plurals>
 </resources>

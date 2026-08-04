@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    A business heading on the admin screen, and also the heading of the "not in any
+    business" group. Tapping it opens the group up or folds it away.
+
+    Given a tinted background so the headings stand out from the people listed under
+    them. Without that, the flattened list reads as one long undifferentiated column.
+-->
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#EEF4FB"
+    android:paddingStart="16dp"
+    android:paddingTop="14dp"
+    android:paddingEnd="16dp"
+    android:paddingBottom="14dp">
+
+    <TextView
+        android:id="@+id/tvAdminGroupName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textColor="#1976D2"
+        android:textSize="17sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@id/tvAdminGroupChevron"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Golden" />
+
+    <TextView
+        android:id="@+id/tvAdminGroupSubtitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:textColor="#757575"
+        android:textSize="13sp"
+        app:layout_constraintEnd_toStartOf="@id/tvAdminGroupChevron"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvAdminGroupName"
+        tools:text="Catering · Tel Aviv" />
+
+    <TextView
+        android:id="@+id/tvAdminGroupCount"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:textColor="#212121"
+        android:textSize="13sp"
+        app:layout_constraintEnd_toStartOf="@id/tvAdminGroupChevron"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvAdminGroupSubtitle"
+        tools:text="3 people" />
+
+    <TextView
+        android:id="@+id/tvAdminGroupChevron"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#1976D2"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="▼" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -205,6 +205,10 @@ public class LoginActivity extends AppCompatActivity {
      * into a team yet, so they go back to the business screen. Only somebody who is both
      * a known person and an approved member of a business reaches a shift feed.
      *
+     * The admin is the exception, and skips the business step entirely: their screen is
+     * the whole app rather than one business, and they belong to none. Sending them down
+     * the normal path would strand them on the join screen with nothing to join.
+     *
      * Getting this order right is the whole point of the rewrite: the app used to drop a
      * new account straight onto an empty dashboard belonging to nothing.
      */
@@ -219,6 +223,11 @@ public class LoginActivity extends AppCompatActivity {
                     }
                     AppUser appUser = AppUser.fromDocument(snapshot);
                     Session.setUser(appUser);
+
+                    if (appUser.isAdmin()) {
+                        openAdmin();
+                        return;
+                    }
                     resolveBusiness(appUser);
                 })
                 .addOnFailureListener(e -> {
@@ -299,13 +308,17 @@ public class LoginActivity extends AppCompatActivity {
         finish();
     }
 
+    private void openAdmin() {
+        analytics.logEvent("home_opened_admin", null);
+        startActivity(new Intent(this, AdminActivity.class));
+        finish();
+    }
+
     private void openHome(AppUser appUser) {
         analytics.logEvent("home_opened_" + appUser.getRole(), null);
 
         Intent intent = new Intent(this,
-                appUser.isManager() || appUser.isAdmin()
-                        ? MainActivity.class
-                        : EmployeeActivity.class);
+                appUser.isManager() ? MainActivity.class : EmployeeActivity.class);
         startActivity(intent);
         finish(); // don't keep the login screen behind the app
     }

@@ -73,6 +73,20 @@ public class MembershipRepository {
     }
 
     /**
+     * Every membership in the app -- the admin view, and nowhere else.
+     *
+     * The admin screen needs the people in every business at once. Reading them business
+     * by business would be one query per business; this is a single read that the screen
+     * then groups by businessId in Java.
+     */
+    public void loadAllMemberships(@NonNull final Callback<List<Membership>> callback) {
+        db.collection(Constants.COLLECTION_MEMBERSHIPS)
+                .get()
+                .addOnSuccessListener(documents -> callback.onSuccess(toList(documents)))
+                .addOnFailureListener(callback::onError);
+    }
+
+    /**
      * Looks for an existing link between this person and this business.
      *
      * Called before creating a new one, so that asking to join twice does not leave two

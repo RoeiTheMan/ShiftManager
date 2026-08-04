@@ -320,8 +320,9 @@ public class BusinessSetupActivity extends AppCompatActivity
                         user.getRole(), user.isActive(), business.getId()));
                 Session.setBusiness(business);
 
-                // The admin follows the manager's path for now; their own overview screen
-                // is a separate screen that arrives with the admin work.
+                // The admin does not normally reach this screen at all -- they are routed
+                // to their own overview at sign-in -- but if they ever join a business
+                // they work in it as a manager would.
                 Intent intent = new Intent(BusinessSetupActivity.this,
                         user.isManager() || user.isAdmin()
                                 ? MainActivity.class
