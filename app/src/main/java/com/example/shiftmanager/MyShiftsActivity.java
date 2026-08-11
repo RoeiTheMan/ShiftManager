@@ -133,6 +133,22 @@ public class MyShiftsActivity extends AppCompatActivity
         captureCheckInLocation();
     }
 
+    /**
+     * Opens the whole shift, the same screen the feed opens.
+     *
+     * Read-only for an employee: ShiftDetailActivity decides what to show from the
+     * viewer's role, so there is nothing extra to guard here.
+     */
+    @Override
+    public void onShiftOpened(Registration registration) {
+        if (registration.getShift() == null) {
+            return;
+        }
+        Intent intent = new Intent(this, ShiftDetailActivity.class);
+        intent.putExtra(Constants.EXTRA_SHIFT_ID, registration.getShift().getId());
+        startActivity(intent);
+    }
+
     private void captureCheckInLocation() {
         final Registration registration = pendingCheckIn;
         if (registration == null) {

@@ -22,6 +22,15 @@ public class MyShiftsAdapter extends RecyclerView.Adapter<MyShiftsAdapter.MyShif
     /** Lets the screen do the GPS work; the adapter only knows a button was pressed. */
     public interface OnCheckInListener {
         void onCheckIn(Registration registration);
+
+        /**
+         * The row itself was tapped, to read the whole shift.
+         *
+         * Added after Roei found the card was a dead end on 2026-08-11: it names a shift
+         * but there was no way to open it, so an employee could not see the description,
+         * the site, or who else was on it.
+         */
+        void onShiftOpened(Registration registration);
     }
 
     private static final String COLOUR_APPROVED = "#2E7D32";
@@ -77,6 +86,12 @@ public class MyShiftsAdapter extends RecyclerView.Adapter<MyShiftsAdapter.MyShif
         }
 
         bindCheckIn(holder, registration);
+
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onShiftOpened(registration);
+            }
+        });
     }
 
     /**
