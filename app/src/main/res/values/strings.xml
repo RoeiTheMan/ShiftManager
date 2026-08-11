@@ -109,6 +109,7 @@
     <string name="business_status_join">Tap to join</string>
     <string name="empty_no_businesses">You are not in a business yet.\nSearch for one above to ask to join.</string>
     <string name="empty_no_search_results">No business by that name.</string>
+    <string name="empty_no_businesses_at_all">No businesses exist yet.</string>
     <string name="confirm_request_join">Ask a manager of %1$s to add you to their team?</string>
     <string name="confirm_accept_invite">%1$s added you to their team. Join them?</string>
     <string name="msg_join_requested">Request sent. A manager has to approve it.</string>
@@ -136,6 +137,8 @@
     <string name="action_invite_member">Add someone to the team</string>
     <string name="action_invite">Send invite</string>
     <string name="invite_help">They need an account already. They will be asked to accept before they join.</string>
+    <string name="hint_search_people">Search by name or email</string>
+    <string name="empty_no_people_to_add">Everyone with an account is already on your team.</string>
     <string name="msg_no_account_for_email">Nobody has signed up with that email yet. Ask them to create an account first.</string>
     <string name="msg_already_member">They are already on your team</string>
     <string name="msg_already_pending">There is already a pending request for them</string>

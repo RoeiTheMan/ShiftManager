@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    "Add someone to the team": a browsable list of accounts, filtered as you type.
+
+    It used to be a single email box, which meant you could only add somebody whose
+    address you already knew by heart. Anyone opening the app fresh, a lecturer marking
+    it included, has no way to guess one, so the list is shown before anything is typed.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingStart="24dp"
+    android:paddingTop="8dp"
+    android:paddingEnd="24dp">
+
+    <EditText
+        android:id="@+id/etPersonSearch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:autofillHints=""
+        android:hint="@string/hint_search_people"
+        android:inputType="text"
+        android:textSize="15sp" />
+
+    <TextView
+        android:id="@+id/tvNoPeople"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:gravity="center"
+        android:text="@string/empty_no_people_to_add"
+        android:textColor="#757575"
+        android:textSize="14sp"
+        android:visibility="gone" />
+
+    <!--
+        Height-capped so a long list scrolls inside the dialog instead of pushing the
+        buttons off the bottom of the screen.
+    -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvPeople"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:maxHeight="320dp"
+        android:minHeight="80dp" />
+
+</LinearLayout>

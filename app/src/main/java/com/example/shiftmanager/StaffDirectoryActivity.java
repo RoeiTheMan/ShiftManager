@@ -1,10 +1,10 @@
 package com.example.shiftmanager;
 
 import android.os.Bundle;
-import android.text.InputType;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -20,7 +20,9 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * The Team screen: everyone attached to this business, and the requests waiting on a
@@ -133,66 +135,100 @@ public class StaffDirectoryActivity extends AppCompatActivity
     // ---------- Inviting somebody (join flow 4) ----------
 
     /**
-     * The manager adds somebody by email address.
+     * The manager picks somebody from a list of accounts.
      *
-     * Only an email is asked for, because the person's name already exists on their own
-     * profile -- typing a second copy here would give the app two names for one person and
-     * no way to know which is right.
+     * This used to be a single email box, which only worked if the manager already knew
+     * the address by heart. Anyone opening the app fresh has no way to guess one -- Roei
+     * raised it on 2026-08-11 about the lecturer marking the project -- so the accounts
+     * are listed up front and the typing only narrows them.
+     *
+     * People already attached to this business are left out rather than shown and
+     * rejected on tap: offering somebody who cannot be added is a dead end.
      */
     private void showInviteDialog() {
-        LinearLayout container = new LinearLayout(this);
-        container.setOrientation(LinearLayout.VERTICAL);
-        int padding = (int) (24 * getResources().getDisplayMetrics().density);
-        container.setPadding(padding, padding / 2, padding, 0);
+        View content = getLayoutInflater().inflate(R.layout.dialog_pick_person, null);
+        final EditText etSearch = content.findViewById(R.id.etPersonSearch);
+        final RecyclerView rvPeople = content.findViewById(R.id.rvPeople);
+        final TextView tvNoPeople = content.findViewById(R.id.tvNoPeople);
 
-        final EditText etEmail = new EditText(this);
-        etEmail.setHint(R.string.hint_employee_email);
-        etEmail.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
-        container.addView(etEmail);
+        final List<AppUser> shown = new ArrayList<>();
+        final List<AppUser> available = new ArrayList<>();
 
-        AlertDialog dialog = new AlertDialog.Builder(this)
+        final AlertDialog dialog = new AlertDialog.Builder(this)
                 .setTitle(R.string.action_invite_member)
-                .setMessage(R.string.invite_help)
-                .setView(container)
-                .setPositiveButton(R.string.action_invite, null) // wired below
+                .setView(content)
                 .setNegativeButton(android.R.string.cancel, null)
                 .create();
 
-        dialog.show();
-
-        // Wired after show() so a bad address keeps the dialog open instead of closing it
-        // and throwing the manager's typing away.
-        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
-            String email = etEmail.getText().toString().trim();
-            if (email.isEmpty()) {
-                etEmail.setError(getString(R.string.error_required));
-                return;
-            }
+        PeopleAdapter adapter = new PeopleAdapter(shown, person -> {
             dialog.dismiss();
-            inviteByEmail(email);
+            checkExistingThenInvite(person);
         });
+        rvPeople.setLayoutManager(new LinearLayoutManager(this));
+        rvPeople.setAdapter(adapter);
+
+        etSearch.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int st, int c, int a) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int st, int b, int c) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                // Filtered here rather than by re-querying Firestore: the accounts are
+                // already loaded, and matching on name as well as email means a manager
+                // who only knows somebody's first name can still find them.
+                String needle = s.toString().trim().toLowerCase();
+                shown.clear();
+                for (AppUser person : available) {
+                    if (needle.isEmpty()
+                            || person.getName().toLowerCase().contains(needle)
+                            || person.getEmail().toLowerCase().contains(needle)) {
+                        shown.add(person);
+                    }
+                }
+                adapter.notifyDataSetChanged();
+                tvNoPeople.setVisibility(shown.isEmpty() ? View.VISIBLE : View.GONE);
+            }
+        });
+
+        dialog.show();
+        loadPeopleToAdd(available, shown, adapter, tvNoPeople);
     }
 
-    private void inviteByEmail(@NonNull final String email) {
-        progressStaff.setVisibility(View.VISIBLE);
+    /** Every account that is not already attached to this business. */
+    private void loadPeopleToAdd(@NonNull final List<AppUser> available,
+                                 @NonNull final List<AppUser> shown,
+                                 @NonNull final PeopleAdapter adapter,
+                                 @NonNull final TextView tvNoPeople) {
+        final Set<String> alreadyHere = new HashSet<>();
+        for (Membership membership : memberships) {
+            alreadyHere.add(membership.getUserId());
+        }
 
-        userRepository.findUserByEmail(email, new Callback<AppUser>() {
+        userRepository.loadAllUsers(new Callback<List<AppUser>>() {
             @Override
-            public void onSuccess(AppUser found) {
-                if (found == null) {
-                    // There is no account to invite. Saying so plainly beats creating a
-                    // half-person record that can never sign in.
-                    progressStaff.setVisibility(View.GONE);
-                    Toast.makeText(StaffDirectoryActivity.this,
-                            R.string.msg_no_account_for_email, Toast.LENGTH_LONG).show();
-                    return;
+            public void onSuccess(List<AppUser> users) {
+                available.clear();
+                for (AppUser person : users) {
+                    if (!alreadyHere.contains(person.getId())) {
+                        available.add(person);
+                    }
                 }
-                checkExistingThenInvite(found);
+                Collections.sort(available,
+                        (a, b) -> a.getName().compareToIgnoreCase(b.getName()));
+
+                shown.clear();
+                shown.addAll(available);
+                adapter.notifyDataSetChanged();
+                tvNoPeople.setVisibility(shown.isEmpty() ? View.VISIBLE : View.GONE);
             }
 
             @Override
             public void onError(Exception error) {
-                progressStaff.setVisibility(View.GONE);
                 FirebaseCrashlytics.getInstance().recordException(error);
                 Toast.makeText(StaffDirectoryActivity.this,
                         R.string.msg_load_failed, Toast.LENGTH_SHORT).show();

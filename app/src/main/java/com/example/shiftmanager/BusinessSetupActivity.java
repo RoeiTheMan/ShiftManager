@@ -103,12 +103,8 @@ public class BusinessSetupActivity extends AppCompatActivity
 
             @Override
             public void afterTextChanged(Editable s) {
-                String query = s.toString().trim();
-                if (query.isEmpty()) {
-                    showMyBusinesses();
-                } else {
-                    searchBusinesses(query);
-                }
+                // Empty means "show everything", not "show nothing".
+                searchBusinesses(s.toString().trim());
             }
         });
     }
@@ -135,12 +131,9 @@ public class BusinessSetupActivity extends AppCompatActivity
                             myMemberships.put(membership.getBusinessId(), membership);
                         }
 
-                        String query = etSearchBusiness.getText().toString().trim();
-                        if (query.isEmpty()) {
-                            showMyBusinesses();
-                        } else {
-                            searchBusinesses(query);
-                        }
+                        // An empty box lists every business rather than nothing, so
+                        // searchBusinesses is called either way.
+                        searchBusinesses(etSearchBusiness.getText().toString().trim());
                     }
 
                     @Override
@@ -152,39 +145,18 @@ public class BusinessSetupActivity extends AppCompatActivity
                 });
     }
 
-    private void showMyBusinesses() {
-        if (myMemberships.isEmpty()) {
-            rows.clear();
-            adapter.notifyDataSetChanged();
-            setLoading(false);
-            showEmpty(R.string.empty_no_businesses);
-            return;
-        }
-
-        setLoading(true);
-        businessRepository.loadBusinesses(new ArrayList<>(myMemberships.keySet()),
-                new Callback<List<Business>>() {
-                    @Override
-                    public void onSuccess(List<Business> businesses) {
-                        rows.clear();
-                        for (Business business : businesses) {
-                            rows.add(new BusinessRow(business,
-                                    myMemberships.get(business.getId())));
-                        }
-                        adapter.notifyDataSetChanged();
-                        setLoading(false);
-                        showEmptyIfNeeded(R.string.empty_no_businesses);
-                    }
-
-                    @Override
-                    public void onError(Exception e) {
-                        setLoading(false);
-                        Toast.makeText(BusinessSetupActivity.this,
-                                R.string.msg_load_failed, Toast.LENGTH_LONG).show();
-                    }
-                });
-    }
-
+    /**
+     * Lists businesses: everything when the box is empty, narrowing as the user types.
+     *
+     * Showing the full list up front is deliberate. Somebody opening this app has no way
+     * to know what businesses exist, so an empty-until-you-type box asks them to guess a
+     * name -- which is a dead end for anyone who is not already in a team, including a
+     * lecturer marking the project. Roei raised exactly that on 2026-08-11.
+     *
+     * Businesses the user already has a link to keep their real status, so the list can
+     * mix "Member", "Waiting" and "Tap to join" rows without offering to join something
+     * twice.
+     */
     private void searchBusinesses(@NonNull String query) {
         setLoading(true);
         businessRepository.searchBusinesses(query, new Callback<List<Business>>() {
@@ -198,7 +170,11 @@ public class BusinessSetupActivity extends AppCompatActivity
                 }
                 adapter.notifyDataSetChanged();
                 setLoading(false);
-                showEmptyIfNeeded(R.string.empty_no_search_results);
+                // An empty list means two different things now: nothing matched what was
+                // typed, or the app genuinely has no businesses in it yet.
+                showEmptyIfNeeded(query.isEmpty()
+                        ? R.string.empty_no_businesses_at_all
+                        : R.string.empty_no_search_results);
             }
 
             @Override
