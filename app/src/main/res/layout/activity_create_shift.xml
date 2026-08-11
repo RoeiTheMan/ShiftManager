@@ -118,12 +118,25 @@
             android:hint="@string/hint_location"
             android:inputType="textCapSentences" />
 
+        <!--
+            Two ways to put real coordinates on a shift. Looking the address up matters
+            because a manager is usually not standing at the venue when they publish it,
+            and without it the address above is only a label.
+        -->
+        <Button
+            android:id="@+id/btnFindAddress"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:backgroundTint="#FFFFFF"
+            android:text="@string/action_find_address"
+            android:textColor="#1976D2" />
+
         <!-- The GPS capability: saves the phone's position onto the shift. -->
         <Button
             android:id="@+id/btnUseMyLocation"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
             android:backgroundTint="#FFFFFF"
             android:text="@string/action_use_my_location"
             android:textColor="#1976D2" />

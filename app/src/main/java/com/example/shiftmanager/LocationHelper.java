@@ -114,6 +114,55 @@ public class LocationHelper {
         }
     }
 
+    /**
+     * Turns a typed address into a position, so a shift can be placed somewhere the
+     * manager is not currently standing.
+     *
+     * Without this the address field is only a label: "use my current location" is the
+     * only way to get real coordinates onto a shift, which means a manager in the office
+     * cannot set up a shift at a venue across town. Roei pointed that out on 2026-08-11.
+     *
+     * Geocoder makes a network call, so it must not run on the UI thread. The blocking
+     * overload is used rather than the newer listener one because that arrived in API 33
+     * and this app supports 24 -- a plain background thread works everywhere and is easier
+     * to explain than two code paths.
+     */
+    public void findAddress(@NonNull final String address,
+                            @NonNull final Callback<Location> callback) {
+        final android.os.Handler main =
+                new android.os.Handler(android.os.Looper.getMainLooper());
+
+        if (!android.location.Geocoder.isPresent()) {
+            // Some builds ship without a geocoding backend at all. Saying so beats a
+            // silent failure that looks like a bad address.
+            callback.onError(new IllegalStateException("No geocoder on this device"));
+            return;
+        }
+
+        new Thread(() -> {
+            try {
+                android.location.Geocoder geocoder =
+                        new android.location.Geocoder(activity, java.util.Locale.getDefault());
+                final java.util.List<android.location.Address> matches =
+                        geocoder.getFromLocationName(address, 1);
+
+                if (matches == null || matches.isEmpty()) {
+                    main.post(() -> callback.onSuccess(null)); // no match is a normal answer
+                    return;
+                }
+
+                android.location.Address match = matches.get(0);
+                final Location found = new Location("geocoder");
+                found.setLatitude(match.getLatitude());
+                found.setLongitude(match.getLongitude());
+                main.post(() -> callback.onSuccess(found));
+            } catch (Exception e) {
+                // Geocoder throws IOException when the backend is unreachable.
+                main.post(() -> callback.onError(e));
+            }
+        }).start();
+    }
+
     /** Formats a position for showing back to the user after it is captured. */
     public static String describe(@Nullable Location location) {
         if (location == null) {

@@ -193,6 +193,51 @@ public class CreateShiftActivity extends AppCompatActivity {
     private void setUpButtons() {
         btnSaveShift.setOnClickListener(v -> saveShift());
         findViewById(R.id.btnUseMyLocation).setOnClickListener(v -> captureLocation());
+        findViewById(R.id.btnFindAddress).setOnClickListener(v -> findTypedAddress());
+    }
+
+    /**
+     * Puts the typed address on the map, so the shift gets real coordinates without the
+     * manager having to be standing at the venue.
+     *
+     * No permission is needed for this one: it reads an address the manager typed rather
+     * than the phone's own position.
+     */
+    private void findTypedAddress() {
+        final String address = textOf(etLocation);
+        if (address.isEmpty()) {
+            etLocation.setError(getString(R.string.error_required));
+            etLocation.requestFocus();
+            return;
+        }
+
+        locationHelper.findAddress(address, new Callback<Location>() {
+            @Override
+            public void onSuccess(Location location) {
+                if (location == null) {
+                    // A real answer, not a failure: the address simply matched nothing.
+                    Toast.makeText(CreateShiftActivity.this,
+                            R.string.msg_address_not_found, Toast.LENGTH_LONG).show();
+                    return;
+                }
+
+                capturedLatitude = location.getLatitude();
+                capturedLongitude = location.getLongitude();
+
+                tvCapturedLocation.setVisibility(View.VISIBLE);
+                tvCapturedLocation.setText(getString(R.string.format_address_found,
+                        capturedLatitude, capturedLongitude));
+
+                analytics.logEvent("shift_address_geocoded", null);
+            }
+
+            @Override
+            public void onError(Exception error) {
+                FirebaseCrashlytics.getInstance().recordException(error);
+                Toast.makeText(CreateShiftActivity.this,
+                        R.string.msg_address_lookup_failed, Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     // ------------------------------------------------------------ pickers
