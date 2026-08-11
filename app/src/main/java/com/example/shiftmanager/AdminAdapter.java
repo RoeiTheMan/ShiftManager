@@ -91,10 +91,22 @@ public class AdminAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             return;
         }
 
-        holder.tvName.setText(person.getName() + " · " + person.getRole());
+        // Duplicate profiles for one email are indistinguishable by name and role -- that
+        // is exactly the mess this screen has to help clear up. Two things tell them
+        // apart: which one is the live profile behind the current login, and when each
+        // was made. The live one is marked, and it is the only one that cannot be deleted.
+        boolean isSignedInUser = Session.getUser() != null
+                && person.getId().equals(Session.getUser().getId());
+
+        String name = person.getName() + " · " + person.getRole();
+        holder.tvName.setText(isSignedInUser
+                ? holder.itemView.getContext().getString(R.string.format_person_you, name)
+                : name);
 
         holder.tvEmail.setVisibility(person.getEmail().isEmpty() ? View.GONE : View.VISIBLE);
-        holder.tvEmail.setText(person.getEmail());
+        holder.tvEmail.setText(holder.itemView.getContext().getString(
+                R.string.format_person_email_created,
+                person.getEmail(), person.getCreatedLabel()));
 
         holder.tvStatus.setText(row.getStatusLabel());
         // Green once they are actually in the business, amber while anyone is still

@@ -171,6 +171,9 @@
         belongs on screen rather than as an unexplained missing field.
     -->
     <string name="admin_person_details">Email: %1$s\nRole: %2$s\nAccount created: %3$s\n\nPasswords cannot be shown to anyone, including the app owner — Firebase stores them only as a one-way hash. Send a reset email instead.</string>
+    <!-- Tells duplicate profiles apart: which one is really you, and when each was made. -->
+    <string name="format_person_you">%1$s — YOU</string>
+    <string name="format_person_email_created">%1$s · created %2$s</string>
     <string name="action_delete_profile">Delete profile</string>
     <string name="confirm_delete_profile">Remove this person\'s profile from the app? Their login is not affected — that can only be deleted in the Firebase console.</string>
     <string name="msg_profile_deleted">Profile deleted</string>
