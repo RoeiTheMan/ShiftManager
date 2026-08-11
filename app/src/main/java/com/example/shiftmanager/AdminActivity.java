@@ -319,7 +319,9 @@ public class AdminActivity extends AppCompatActivity implements AdminAdapter.OnA
         AlertDialog.Builder builder = new AlertDialog.Builder(this)
                 .setTitle(person.getName())
                 .setMessage(details)
-                .setNegativeButton(R.string.action_close, null);
+                .setNegativeButton(R.string.action_close, null)
+                .setNeutralButton(R.string.action_delete_profile,
+                        (dialog, which) -> confirmDeleteProfile(person));
 
         // A reset can only be sent somewhere, so the button is only offered when there is
         // an address to send it to.
@@ -329,6 +331,49 @@ public class AdminActivity extends AppCompatActivity implements AdminAdapter.OnA
         }
 
         builder.show();
+    }
+
+    /**
+     * Deleting a profile is how the admin clears out duplicates.
+     *
+     * They accumulate on their own: removing a login in the Firebase console leaves its
+     * profile behind, and signing up again with the same address writes a second one. Four
+     * profiles for one email is the state this button exists to clean up.
+     */
+    private void confirmDeleteProfile(@NonNull final AppUser person) {
+        new AlertDialog.Builder(this)
+                .setTitle(person.getName())
+                .setMessage(R.string.confirm_delete_profile)
+                .setNegativeButton(android.R.string.cancel, null)
+                .setPositiveButton(R.string.action_delete_profile,
+                        (dialog, which) -> deleteProfile(person))
+                .show();
+    }
+
+    private void deleteProfile(@NonNull AppUser person) {
+        // Deleting your own profile would leave you signed in with nothing behind you, and
+        // the next screen to read the session would find a person who no longer exists.
+        if (Session.getUser() != null && person.getId().equals(Session.getUser().getId())) {
+            Toast.makeText(this, R.string.msg_cannot_delete_self, Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        userRepository.deleteProfile(person.getId(), new Callback<Void>() {
+            @Override
+            public void onSuccess(Void unused) {
+                analytics.logEvent("admin_profile_deleted", null);
+                Toast.makeText(AdminActivity.this,
+                        R.string.msg_profile_deleted, Toast.LENGTH_SHORT).show();
+                loadEverything();
+            }
+
+            @Override
+            public void onError(Exception e) {
+                FirebaseCrashlytics.getInstance().recordException(e);
+                Toast.makeText(AdminActivity.this,
+                        R.string.msg_save_failed, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void sendPasswordReset(@NonNull String email) {

@@ -104,6 +104,26 @@ public class UserRepository {
                 .addOnFailureListener(callback::onError);
     }
 
+    /**
+     * Removes a profile document. The admin view, and nowhere else.
+     *
+     * This deletes the app's record of a person, NOT their login -- Firebase Auth accounts
+     * can only be removed from the console. That is exactly what is wanted here, because
+     * the profiles worth deleting are the orphans: deleting a login leaves its profile
+     * behind, and re-registering the same email writes a second one, so they pile up.
+     *
+     * Any memberships are deliberately left alone. They carry their own copy of the name
+     * and email, and the team and admin screens fall back to it when the profile has gone,
+     * so a deleted profile does not make somebody vanish from a business they are in.
+     */
+    public void deleteProfile(@NonNull String userId, @NonNull final Callback<Void> callback) {
+        db.collection(Constants.COLLECTION_USERS)
+                .document(userId)
+                .delete()
+                .addOnSuccessListener(callback::onSuccess)
+                .addOnFailureListener(callback::onError);
+    }
+
     /** Every account in the app -- the admin view, and nowhere else. */
     public void loadAllUsers(@NonNull final Callback<List<AppUser>> callback) {
         db.collection(Constants.COLLECTION_USERS)

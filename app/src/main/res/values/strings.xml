@@ -171,6 +171,10 @@
         belongs on screen rather than as an unexplained missing field.
     -->
     <string name="admin_person_details">Email: %1$s\nRole: %2$s\nAccount created: %3$s\n\nPasswords cannot be shown to anyone, including the app owner — Firebase stores them only as a one-way hash. Send a reset email instead.</string>
+    <string name="action_delete_profile">Delete profile</string>
+    <string name="confirm_delete_profile">Remove this person\'s profile from the app? Their login is not affected — that can only be deleted in the Firebase console.</string>
+    <string name="msg_profile_deleted">Profile deleted</string>
+    <string name="msg_cannot_delete_self">You cannot delete your own profile while signed in as it.</string>
     <string name="msg_password_reset_sent">Password reset email sent</string>
     <string name="msg_password_reset_failed">Could not send a reset email. The account may sign in with Google only.</string>
 
