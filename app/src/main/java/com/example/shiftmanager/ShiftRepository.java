@@ -161,6 +161,36 @@ public class ShiftRepository {
     }
 
     /**
+     * Saves changes to an existing shift.
+     *
+     * Only the fields the form owns are written, using update rather than set: createdBy,
+     * createdAt and status belong to the shift's history, and a set() would wipe them.
+     *
+     * Registrations are untouched on purpose. People who already signed up stay signed up
+     * when a manager fixes a typo or corrects the address -- which is the whole reason to
+     * edit rather than delete and re-publish.
+     */
+    public void updateShift(@NonNull String shiftId, @NonNull Shift shift,
+                            @NonNull final Callback<Void> callback) {
+        Map<String, Object> data = new HashMap<>();
+        data.put(Constants.FIELD_TITLE, shift.getTitle());
+        data.put(Constants.FIELD_DESCRIPTION, shift.getDescription());
+        data.put(Constants.FIELD_DATE, shift.getDate());
+        data.put(Constants.FIELD_START_TIME, shift.getStartTime());
+        data.put(Constants.FIELD_END_TIME, shift.getEndTime());
+        data.put(Constants.FIELD_LOCATION, shift.getLocation());
+        data.put(Constants.FIELD_LATITUDE, shift.getLatitude());
+        data.put(Constants.FIELD_LONGITUDE, shift.getLongitude());
+        data.put(Constants.FIELD_ROLE_REQUIREMENTS, shift.getRoleRequirements());
+
+        db.collection(Constants.COLLECTION_SHIFTS)
+                .document(shiftId)
+                .update(data)
+                .addOnSuccessListener(callback::onSuccess)
+                .addOnFailureListener(callback::onError);
+    }
+
+    /**
      * Deletes a shift and every registration attached to it.
      *
      * Deleting the shift on its own would leave orphan registrations behind, which would

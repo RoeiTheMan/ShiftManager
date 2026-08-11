@@ -31,7 +31,9 @@
             android:textColor="#1976D2"
             android:textSize="16sp" />
 
+        <!-- Reads "New shift" or "Edit shift"; the same form does both. -->
         <TextView
+            android:id="@+id/tvCreateShiftTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"

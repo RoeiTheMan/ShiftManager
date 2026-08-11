@@ -29,7 +29,14 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /**
- * The manager's form for publishing a new shift.
+ * The manager's form for publishing a shift, and for editing one that already exists.
+ *
+ * One screen does both. The fields, the pickers, the validation and the per-role rows are
+ * identical either way, and a second near-copy of this form would be two places to fix
+ * every time the shift model changes.
+ *
+ * Which mode it is in depends entirely on whether an EXTRA_SHIFT_ID arrived: with one, the
+ * shift is loaded and the form starts pre-filled; without one, it starts blank.
  *
  * Date and time are entered through the system pickers rather than typed, so what reaches
  * Firestore is always in the same format ("yyyy-MM-dd" and "HH:mm"). That matters because
@@ -39,6 +46,10 @@ import java.util.TreeMap;
 public class CreateShiftActivity extends AppCompatActivity {
 
     private final ShiftRepository shiftRepository = new ShiftRepository();
+
+    /** Null when publishing a new shift; the shift's id when editing an existing one. */
+    @Nullable
+    private String editingShiftId;
 
     private EditText etTitle;
     private EditText etDescription;
@@ -80,6 +91,63 @@ public class CreateShiftActivity extends AppCompatActivity {
         // A visible way out. The system back gesture already worked, but it is not
         // discoverable, so the form read as a screen you could only leave by saving.
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
+
+        editingShiftId = getIntent().getStringExtra(Constants.EXTRA_SHIFT_ID);
+        if (editingShiftId != null) {
+            enterEditMode();
+        }
+    }
+
+    // ------------------------------------------------------------ edit mode
+
+    /** Relabels the screen for editing, then fills it in from the stored shift. */
+    private void enterEditMode() {
+        ((TextView) findViewById(R.id.tvCreateShiftTitle)).setText(R.string.edit_shift_title);
+        btnSaveShift.setText(R.string.action_save_changes);
+        btnSaveShift.setEnabled(false); // nothing to save until the shift has loaded
+
+        shiftRepository.loadShift(editingShiftId, new Callback<Shift>() {
+            @Override
+            public void onSuccess(Shift shift) {
+                fillForm(shift);
+                btnSaveShift.setEnabled(true);
+            }
+
+            @Override
+            public void onError(Exception error) {
+                // Editing a shift we cannot read would save blank fields over real ones.
+                FirebaseCrashlytics.getInstance().recordException(error);
+                Toast.makeText(CreateShiftActivity.this,
+                        R.string.msg_load_failed, Toast.LENGTH_LONG).show();
+                finish();
+            }
+        });
+    }
+
+    private void fillForm(@NonNull Shift shift) {
+        etTitle.setText(shift.getTitle());
+        etDescription.setText(shift.getDescription());
+        etDate.setText(shift.getDate());
+        etStartTime.setText(shift.getStartTime());
+        etEndTime.setText(shift.getEndTime());
+        etLocation.setText(shift.getLocation());
+
+        // Carried forward so saving without touching the location button keeps the
+        // coordinates the shift already had instead of silently resetting them to 0.
+        capturedLatitude = shift.getLatitude();
+        capturedLongitude = shift.getLongitude();
+        if (shift.hasCoordinates()) {
+            tvCapturedLocation.setVisibility(View.VISIBLE);
+            tvCapturedLocation.setText(getString(R.string.format_saved_location,
+                    shift.getLatitude(), shift.getLongitude()));
+        }
+
+        for (Map.Entry<String, EditText> entry : roleCountFields.entrySet()) {
+            Integer needed = shift.getRoleRequirements().get(entry.getKey());
+            // Roles this shift does not ask for stay blank rather than showing 0, which
+            // is also how the form treats "not needed" when saving.
+            entry.getValue().setText(needed != null && needed > 0 ? String.valueOf(needed) : "");
+        }
     }
 
     private void bindViews() {
@@ -236,10 +304,10 @@ public class CreateShiftActivity extends AppCompatActivity {
             return;
         }
 
-        btnSaveShift.setEnabled(false); // stops a double tap creating the shift twice
+        btnSaveShift.setEnabled(false); // stops a double tap saving the shift twice
 
         Shift shift = new Shift(
-                null,
+                editingShiftId,
                 Session.getBusiness().getId(),
                 textOf(etTitle),
                 textOf(etDescription),
@@ -253,6 +321,11 @@ public class CreateShiftActivity extends AppCompatActivity {
                 Constants.SHIFT_OPEN,
                 user.getUid());
 
+        if (editingShiftId != null) {
+            updateExistingShift(shift);
+            return;
+        }
+
         shiftRepository.createShift(shift, new Callback<String>() {
             @Override
             public void onSuccess(String shiftId) {
@@ -261,6 +334,27 @@ public class CreateShiftActivity extends AppCompatActivity {
                 Toast.makeText(CreateShiftActivity.this,
                         R.string.msg_shift_created, Toast.LENGTH_SHORT).show();
                 finish(); // back to the dashboard, which reloads in onResume
+            }
+
+            @Override
+            public void onError(Exception error) {
+                btnSaveShift.setEnabled(true);
+                FirebaseCrashlytics.getInstance().recordException(error);
+                Toast.makeText(CreateShiftActivity.this,
+                        R.string.msg_save_failed, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void updateExistingShift(@NonNull Shift shift) {
+        shiftRepository.updateShift(editingShiftId, shift, new Callback<Void>() {
+            @Override
+            public void onSuccess(Void unused) {
+                analytics.logEvent("shift_edited", null);
+                FirebaseCrashlytics.getInstance().log("Shift edited: " + editingShiftId);
+                Toast.makeText(CreateShiftActivity.this,
+                        R.string.msg_shift_updated, Toast.LENGTH_SHORT).show();
+                finish();
             }
 
             @Override

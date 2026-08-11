@@ -6,6 +6,12 @@
     <string name="my_shifts_title">My shifts</string>
     <string name="staff_directory_title">Team</string>
     <string name="create_shift_title">New shift</string>
+    <string name="edit_shift_title">Edit shift</string>
+    <string name="action_edit_shift">Edit shift</string>
+    <string name="action_save_changes">Save changes</string>
+    <string name="msg_shift_updated">Shift updated</string>
+    <!-- Shown when editing a shift that already has coordinates saved on it. -->
+    <string name="format_saved_location">Saved location: %1$.4f, %2$.4f</string>
 
     <!-- Bottom navigation tabs -->
     <string name="nav_shifts">Shifts</string>

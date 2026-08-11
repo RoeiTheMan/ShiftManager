@@ -51,6 +51,7 @@ public class ShiftDetailActivity extends AppCompatActivity
     private ProgressBar progressDetail;
     private RecyclerView rvApplicants;
     private Button btnDeleteShift;
+    private Button btnEditShift;
 
     private String shiftId;
     private Shift shift;
@@ -86,6 +87,14 @@ public class ShiftDetailActivity extends AppCompatActivity
 
         btnDeleteShift.setOnClickListener(v -> confirmDeleteShift());
 
+        // Opens the publish form pre-filled. Editing beats deleting and re-publishing,
+        // which would throw away everyone who had already signed up.
+        btnEditShift.setOnClickListener(v -> {
+            Intent intent = new Intent(this, CreateShiftActivity.class);
+            intent.putExtra(Constants.EXTRA_SHIFT_ID, shiftId);
+            startActivity(intent);
+        });
+
         // Back to whichever feed opened this shift. finish() rather than starting a
         // screen, so the caller is returned to instead of a second copy being stacked.
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
@@ -103,6 +112,7 @@ public class ShiftDetailActivity extends AppCompatActivity
         progressDetail = findViewById(R.id.progressDetail);
         rvApplicants = findViewById(R.id.rvApplicants);
         btnDeleteShift = findViewById(R.id.btnDeleteShift);
+        btnEditShift = findViewById(R.id.btnEditShift);
     }
 
     private void setUpList() {
@@ -173,6 +183,7 @@ public class ShiftDetailActivity extends AppCompatActivity
         tvShiftDescription.setText(shift.getDescription());
 
         btnDeleteShift.setVisibility(viewerIsManager ? View.VISIBLE : View.GONE);
+        btnEditShift.setVisibility(viewerIsManager ? View.VISIBLE : View.GONE);
     }
 
     private void loadApplicants() {
